@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>glow flow</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="game-wrapper">
+      <div id="game-container"></div>
+      <div id="score">SCORE: 0</div>
+      <div id="game-over">GAME OVER</div>
+      <div id="restart-btn">RESTART</div>
+      <div id="settings-btn">&#9881;</div>
+      <div id="settings-panel">
+        <span class="close-settings">✕</span>
+        <h2 class="title">SETTINGS</h2>
+        <div class="settings-option">
+          <label for="music-toggle">Background Music:</label>
+          <select id="music-toggle">
+            <option value="on">On</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+        <div class="settings-option">
+          <label for="sound-effects">Sound Effects:</label>
+          <select id="sound-effects">
+            <option value="on">On</option>
+            <option value="off">Off</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <audio id="bg-music" loop>
+      <source src="bg-music.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="collision-sound">
+      <source src="collision.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="explosion-sound">
+      <source src="explosion.mp3" type="audio/mpeg" />
+    </audio>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
