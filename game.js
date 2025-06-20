@@ -110,7 +110,7 @@ let canSpawnNewPiece = true;
 let scoreAnimationFrame;
 let pieceInterval;
 let checkLinesInterval;
-let baseArea = 3500;
+let baseArea = 2000;
 let unlockedColors = 4;
 let isCheckingLines = false;
 
