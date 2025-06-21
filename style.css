@@ -4,11 +4,10 @@ body {
   padding: 0;
   overflow: hidden;
   font-family: "Arial", sans-serif;
-  background: #0f0c29;
   background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: top;
   height: 100vh;
   touch-action: none;
 }
