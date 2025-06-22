@@ -151,7 +151,7 @@ function initColors() {
 
 // Проверка и разблокировка новых цветов
 function checkColorUnlocks() {
-  const requiredScore = 10000;
+  const requiredScore = 1000;
   const maxColors = 50;
   
   // Вычисляем сколько цветов должно быть разблокировано
@@ -370,7 +370,7 @@ function createPiece() {
 // Добавление очков с анимацией
 function addScore(points, color, x, y) {
   if (points <= 0) return;
-  if (points > 10000) points = 10000;
+  if (points > 1000) points = 1000;
   
   score += points;
   createScorePopup(x, y, points, color);
@@ -466,7 +466,7 @@ function checkLines() {
           });
 
           // Добавляем очки за уничтожение кластер
-          const clusterScore = Math.floor(4000 + Math.random() * 2000);
+          const clusterScore = Math.floor(400 + Math.random() * 200);
           addScore(clusterScore, color, centerX, centerY);
 
           // Воспроизводим звук взрыва
@@ -674,7 +674,7 @@ Events.on(engine, "collisionStart", (event) => {
         }
 
         // Очки за касание: 75-125
-        const collisionScore = Math.floor(75 + Math.random() * 50);
+        const collisionScore = Math.floor(10 + Math.random() * 5);
         addScore(
           collisionScore,
           currentPiece.color,
