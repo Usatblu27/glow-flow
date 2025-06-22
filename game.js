@@ -151,72 +151,20 @@ function initColors() {
 
 // Проверка и разблокировка новых цветов
 function checkColorUnlocks() {
-  if (score >= 5 && unlockedColors < 4) {
-    unlockedColors = 4;
-    initColors();
-  } else if (score >= 5000 && unlockedColors < 5) {
-    unlockedColors = 5;
-    initColors();
-  } else if (score >= 10000 && unlockedColors < 6) {
-    unlockedColors = 6;
-    initColors();
-  } else if (score >= 15000 && unlockedColors < 7) {
-    unlockedColors = 7;
-    initColors();
-  } else if (score >= 20000 && unlockedColors < 8) {
-    unlockedColors = 8;
-    initColors();
-  } else if (score >= 25000 && unlockedColors < 9) {
-    unlockedColors = 9;
-    initColors();
-  } else if (score >= 30000 && unlockedColors < 10) {
-    unlockedColors = 10;
-    initColors();
-  } else if (score >= 35000 && unlockedColors < 11) {
-    unlockedColors = 11;
-    initColors();
-  } else if (score >= 40000 && unlockedColors < 12) {
-    unlockedColors = 12;
-    initColors();
-  } else if (score >= 45000 && unlockedColors < 13) {
-    unlockedColors = 13;
-    initColors();
-  } else if (score >= 50000 && unlockedColors < 14) {
-    unlockedColors = 14;
-    initColors();
-  } else if (score >= 55000 && unlockedColors < 15) {
-    unlockedColors = 15;
-    initColors();
-  } else if (score >= 60000 && unlockedColors < 16) {
-    unlockedColors = 16;
-    initColors();
-  } else if (score >= 65000 && unlockedColors < 17) {
-    unlockedColors = 17;
-    initColors();
-  } else if (score >= 70000 && unlockedColors < 18) {
-    unlockedColors = 18;
-    initColors();
-  } else if (score >= 75000 && unlockedColors < 19) {
-    unlockedColors = 19;
-    initColors();
-  } else if (score >= 80000 && unlockedColors < 21) {
-    unlockedColors = 21;
-    initColors();
-  } else if (score >= 85000 && unlockedColors < 22) {
-    unlockedColors = 20;
-    initColors();
-  } else if (score >= 90000 && unlockedColors < 20) {
-    unlockedColors = 22;
-    initColors();
-  } else if (score >= 95000 && unlockedColors < 23) {
-    unlockedColors = 23;
-    initColors();
-  } else if (score >= 100000 && unlockedColors < 24) {
-    unlockedColors = 24;
+  const requiredScore = 10000;
+  const maxColors = 50;
+  
+  // Вычисляем сколько цветов должно быть разблокировано
+  const colorsToUnlock = Math.min(
+    Math.floor(score / requiredScore) + 4, 
+    maxColors
+  );
+  
+  if (colorsToUnlock > unlockedColors) {
+    unlockedColors = colorsToUnlock;
     initColors();
   }
 }
-
 // Создание границ
 const ground = Bodies.rectangle(
   gameWidth / 2,
@@ -425,9 +373,11 @@ function createPiece() {
 
 // Добавление очков с анимацией
 function addScore(points, color, x, y) {
-  score += points;
-  createScorePopup(x, y, points, color);
-  animateScore();
+  if (points > 0) {
+    score += points;
+    createScorePopup(x, y, points, color);
+    animateScore();
+  }
 }
 
 function checkLines() {
@@ -518,8 +468,8 @@ function checkLines() {
             if (index > -1) pieces.splice(index, 1);
           });
 
-          // Добавляем очки за уничтожение кластера
-          const clusterScore = cluster.length * 200;
+          // Добавляем очки за уничтожение кластер
+          const clusterScore = 4000 + Math.random() * 2000;
           addScore(clusterScore, color, centerX, centerY);
 
           // Воспроизводим звук взрыва
@@ -720,7 +670,7 @@ Events.on(engine, "collisionStart", (event) => {
       }
 
       // Добавляем очки за столкновение
-      const collisionScore = Math.floor(3 + Math.random() * 5);
+      const collisionScore = 75 + Math.random() * 50;
       addScore(
         collisionScore,
         currentPiece.color,
