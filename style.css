@@ -16,7 +16,8 @@ body {
   position: relative;
   max-width: 500px;
   width: 100%;
-  height: 80vh;
+  margin-top: 5vh;
+  height: 50vh;
   border: 4px solid white;
   box-shadow: 0 0 20px white, inset 0 0 20px white;
   border-radius: 10px;
