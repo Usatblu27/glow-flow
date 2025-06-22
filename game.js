@@ -365,19 +365,16 @@ function createPiece() {
   World.add(engine.world, piece);
   pieces.push(piece);
   currentPiece = piece;
-
-  // Добавляем очки за размещение фигуры
-  const placementScore = Math.floor(60 + Math.random() * 50);
-  addScore(placementScore, color, x, 50);
 }
 
 // Добавление очков с анимацией
 function addScore(points, color, x, y) {
-  if (points > 0) {
-    score += points;
-    createScorePopup(x, y, points, color);
-    animateScore();
-  }
+  if (points <= 0) return;
+  if (points > 10000) points = 10000;
+  
+  score += points;
+  createScorePopup(x, y, points, color);
+  animateScore();
 }
 
 function checkLines() {
@@ -469,7 +466,7 @@ function checkLines() {
           });
 
           // Добавляем очки за уничтожение кластер
-          const clusterScore = 4000 + Math.random() * 2000;
+          const clusterScore = Math.floor(4000 + Math.random() * 2000);
           addScore(clusterScore, color, centerX, centerY);
 
           // Воспроизводим звук взрыва
@@ -652,6 +649,7 @@ Events.on(engine, "collisionStart", (event) => {
   if (!gameActive || isCheckingLines) return;
 
   const pairs = event.pairs;
+  let collisionProcessed = false;
 
   for (let i = 0; i < pairs.length; i++) {
     const pair = pairs[i];
@@ -667,24 +665,29 @@ Events.on(engine, "collisionStart", (event) => {
       if (soundEffects.value === "on") {
         collisionSound.currentTime = 0;
         collisionSound.play();
+      } if (!collisionProcessed) { // Обрабатываем только первое столкновение
+        collisionProcessed = true;
+        
+        if (soundEffects.value === "on") {
+          collisionSound.currentTime = 0;
+          collisionSound.play();
+        }
+
+        // Очки за касание: 75-125
+        const collisionScore = Math.floor(75 + Math.random() * 50);
+        addScore(
+          collisionScore,
+          currentPiece.color,
+          currentPiece.position.x,
+          currentPiece.position.y
+        );
+
+        currentPiece = null;
+
+        setTimeout(() => {
+          canSpawnNewPiece = true;
+        }, 100);
       }
-
-      // Добавляем очки за столкновение
-      const collisionScore = 75 + Math.random() * 50;
-      addScore(
-        collisionScore,
-        currentPiece.color,
-        currentPiece.position.x,
-        currentPiece.position.y
-      );
-
-      currentPiece = null;
-
-      // Задержка перед разрешением спавна новой фигуры
-      setTimeout(() => {
-        canSpawnNewPiece = true;
-      }, 100);
-
       break;
     }
   }
