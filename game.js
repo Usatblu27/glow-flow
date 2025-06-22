@@ -69,57 +69,27 @@ function createSimpleStyle(color) {
 
 const pieces = [];
 const allColors = [
-  "#FF0000", // Красный
-  "#00FF00", // Зеленый
-  "#0000FF", // Синий
-  "#FFFF00", // Желтый
-  "#800080", // Фиолетовый
-  "#40E0D0", // Бирюзовый
-  "#FFA500", // Оранжевый
-  "#FFC0CB", // Розовый
-  "#A52A2A", // Коричневый
-  "#808080", // Серый
-  "#BFFF00", // Лаймовый
-  "#ADD8E6", // Голубой
-  "#E0B0FF", // Пурпурный
-  "#FFD700", // Золотой
-  "#C0C0C0", // Серебряный
-  "#800000", // Бордовый
-  "#00008B", // Темно-синий
-  "#808000", // Оливковый
-  "#DC143C", // Малиновый
-  "#00CED1", // Бирюзово-зеленый
-  "#E6E6FA", // Лавандовый
-  "#FFDAB9", // Персиковый
-  "#98FF98", // Мятный
-  "#9400D3", // Темно-фиолетовый
-  "#FF7F50", // Коралловый
-  "#4B0082", // Индиго
-  "#F0E68C", // Хаки
-  "#7FFF00", // Салатовый
-  "#006400", // Темно-зеленый
-  "#FFFDD0", // Кремовый
-  "#F5DEB3", // Медовый
-  "#FF00FF", // Фуксия
-  "#7FFFD4", // Аквамарин
-  "#DDA0DD", // Сливовый
-  "#B22222", // Кирпичный
-  "#FFF700", // Лимонный
-  "#20B2AA", // Морской волны
-  "#F4A460", // Песочный
-  "#8A2BE2", // Черничный
-  "#E2725B", // Терракотовый
-  "#98FB98", // Бледно-зеленый
-  "#C8A2C8", // Сиреневый
-  "#FFDB58", // Горчичный
-  "#E75480", // Темно-розовый
-  "#F4C2C2", // Чайная роза
-  "#B0E0E6", // Пыльно-голубой
-  "#CC7722", // Охра
-  "#DCD0FF", // Бледно-лиловый
-  "#D3D3D3", // Туманно-серый
-  "#F5F5DC", // Светло-бежевый
-];
+    "#FF0000", // Red
+    "#00FF00", // Green
+    "#0000FF", // Blue
+    "#FFFF00", // Yellow
+    "#FF00FF", // Magenta
+    "#00FFFF", // Cyan
+    "#FF9900", // Orange
+    "#9900FF", // Purple
+    "#00FF99", // Teal
+    "#FF0099", // Pink
+    "#99FF00", // Lime
+    "#0099FF", // Sky Blue
+    "#FF6600", // Dark Orange
+    "#6600FF", // Violet
+    "#00FF66", // Spring Green
+    "#FF0066", // Rose
+    "#33FF00", // Bright Green
+    "#0033FF", // Royal Blue
+    "#FF3300", // Red Orange
+    "#3300FF", // Blue Violet
+  ];
 const shapes = [
   "circle",
   "square",
@@ -151,19 +121,58 @@ function initColors() {
 
 // Проверка и разблокировка новых цветов
 function checkColorUnlocks() {
-  const requiredScore = 1000;
-  const maxColors = 50;
-  
-  // Вычисляем сколько цветов должно быть разблокировано
-  const colorsToUnlock = Math.min(
-    Math.floor(score / requiredScore) + 4, 
-    maxColors
-  );
-  
-  if (colorsToUnlock > unlockedColors) {
-    unlockedColors = colorsToUnlock;
-    initColors();
-  }
+    if (score >= 300 && unlockedColors < 4) {
+        unlockedColors = 4;
+        initColors();
+    } else if (score >= 600 && unlockedColors < 5) {
+        unlockedColors = 5;
+        initColors();
+    } else if (score >= 1000 && unlockedColors < 6) {
+        unlockedColors = 6;
+        initColors();
+    } else if (score >= 1500 && unlockedColors < 7) {
+        unlockedColors = 7;
+        initColors();
+    } else if (score >= 2100 && unlockedColors < 8) {
+        unlockedColors = 8;
+        initColors();
+    } else if (score >= 2800 && unlockedColors < 9) {
+        unlockedColors = 9;
+        initColors();
+    } else if (score >= 3600 && unlockedColors < 10) {
+        unlockedColors = 10;
+        initColors();
+    } else if (score >= 4500 && unlockedColors < 11) {
+        unlockedColors = 11;
+        initColors();
+    } else if (score >= 5500 && unlockedColors < 12) {
+        unlockedColors = 12;
+        initColors();
+    } else if (score >= 6600 && unlockedColors < 13) {
+        unlockedColors = 13;
+        initColors();
+    } else if (score >= 7800 && unlockedColors < 14) {
+        unlockedColors = 14;
+        initColors();
+    } else if (score >= 9100 && unlockedColors < 15) {
+        unlockedColors = 15;
+        initColors();
+    } else if (score >= 10500 && unlockedColors < 16) {
+        unlockedColors = 16;
+        initColors();
+    } else if (score >= 12000 && unlockedColors < 17) {
+        unlockedColors = 17;
+        initColors();
+    } else if (score >= 13600 && unlockedColors < 18) {
+        unlockedColors = 18;
+        initColors();
+    } else if (score >= 15300 && unlockedColors < 19) {
+        unlockedColors = 19;
+        initColors();
+    } else if (score >= 17100 && unlockedColors < 20) {
+        unlockedColors = 20;
+        initColors();
+    }
 }
 // Создание границ
 const ground = Bodies.rectangle(
