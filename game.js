@@ -8,22 +8,24 @@ const Engine = Matter.Engine,
   Query = Matter.Query;
 
 const engine = Engine.create({
-  positionIterations: 10,
-  velocityIterations: 10,
-  constraintIterations: 5,
+  positionIterations: 50,
+  velocityIterations: 50,
+  constraintIterations: 20,
 });
 engine.gravity.y = 0.3;
 
 const pieceMaterial = {
   friction: 0.3,
-  restitution: 0.1,
-  frictionStatic: 0.1,
-  frictionAir: 0.02,
-  slop: 0.05,
+  restitution: 0.2,
+  frictionStatic: 0.5,
+  slop: 0.1,
   chamfer: { radius: 5 },
+  stiffness: 0.9,
 };
+function shouldVibrate() {
+  return vibrationToggle.value === "on" && "vibrate" in navigator;
+}
 
-// Получаем элементы DOM
 const gameWrapper = document.getElementById("game-wrapper");
 const gameContainer = document.getElementById("game-container");
 const gameOverDisplay = document.getElementById("game-over");
@@ -38,7 +40,7 @@ const collisionSound = document.getElementById("collision-sound");
 const explosionSound = document.getElementById("explosion-sound");
 
 bgMusic.volume = 0.2;
-collisionSound.volume = 0.2;
+collisionSound.volume = 0.3;
 explosionSound.volume = 0.3;
 
 const gameWidth = gameWrapper.clientWidth;
@@ -69,27 +71,23 @@ function createSimpleStyle(color) {
 
 const pieces = [];
 const allColors = [
-    "#FF0000", // Red
-    "#00FF00", // Green
-    "#0000FF", // Blue
-    "#FFFF00", // Yellow
-    "#FF00FF", // Magenta
-    "#00FFFF", // Cyan
-    "#FF9900", // Orange
-    "#9900FF", // Purple
-    "#00FF99", // Teal
-    "#FF0099", // Pink
-    "#99FF00", // Lime
-    "#0099FF", // Sky Blue
-    "#FF6600", // Dark Orange
-    "#6600FF", // Violet
-    "#00FF66", // Spring Green
-    "#FF0066", // Rose
-    "#33FF00", // Bright Green
-    "#0033FF", // Royal Blue
-    "#FF3300", // Red Orange
-    "#3300FF", // Blue Violet
-  ];
+  "#FE0000",
+  "#3FFF0F",
+  "#005DFF",
+  "#F5FF00",
+  "#FF009C",
+  "#01FFE5",
+  "#FF9C00",
+  "#C500FF",
+  "#960000",
+  "#259609",
+  "#00389C",
+  "#999E00",
+  "#99005E",
+  "#019C8C",
+  "#965C00",
+  "#770099",
+];
 const shapes = [
   "circle",
   "square",
@@ -113,68 +111,200 @@ let checkLinesInterval;
 let baseArea = 1500;
 let unlockedColors = 4;
 let isCheckingLines = false;
+let bestScore = parseInt(localStorage.getItem("bestScore")) || 0;
+let displayedBestScore = bestScore;
+let hasNewRecordInThisGame = false;
 
-// Инициализация цветов
 function initColors() {
   colors = allColors.slice(0, unlockedColors);
 }
 
-// Проверка и разблокировка новых цветов
-function checkColorUnlocks() {
-    if (score >= 300 && unlockedColors < 4) {
-        unlockedColors = 4;
-        initColors();
-    } else if (score >= 600 && unlockedColors < 5) {
-        unlockedColors = 5;
-        initColors();
-    } else if (score >= 1000 && unlockedColors < 6) {
-        unlockedColors = 6;
-        initColors();
-    } else if (score >= 1500 && unlockedColors < 7) {
-        unlockedColors = 7;
-        initColors();
-    } else if (score >= 2100 && unlockedColors < 8) {
-        unlockedColors = 8;
-        initColors();
-    } else if (score >= 2800 && unlockedColors < 9) {
-        unlockedColors = 9;
-        initColors();
-    } else if (score >= 3600 && unlockedColors < 10) {
-        unlockedColors = 10;
-        initColors();
-    } else if (score >= 4500 && unlockedColors < 11) {
-        unlockedColors = 11;
-        initColors();
-    } else if (score >= 5500 && unlockedColors < 12) {
-        unlockedColors = 12;
-        initColors();
-    } else if (score >= 6600 && unlockedColors < 13) {
-        unlockedColors = 13;
-        initColors();
-    } else if (score >= 7800 && unlockedColors < 14) {
-        unlockedColors = 14;
-        initColors();
-    } else if (score >= 9100 && unlockedColors < 15) {
-        unlockedColors = 15;
-        initColors();
-    } else if (score >= 10500 && unlockedColors < 16) {
-        unlockedColors = 16;
-        initColors();
-    } else if (score >= 12000 && unlockedColors < 17) {
-        unlockedColors = 17;
-        initColors();
-    } else if (score >= 13600 && unlockedColors < 18) {
-        unlockedColors = 18;
-        initColors();
-    } else if (score >= 15300 && unlockedColors < 19) {
-        unlockedColors = 19;
-        initColors();
-    } else if (score >= 17100 && unlockedColors < 20) {
-        unlockedColors = 20;
-        initColors();
+function updateBestScore() {
+  if (score > bestScore) {
+    const oldBest = bestScore;
+    bestScore = score;
+    localStorage.setItem("bestScore", bestScore.toString());
+
+    animateBestScore();
+    if (navigator.vibrate) navigator.vibrate(50);
+
+    if (!hasNewRecordInThisGame && oldBest > 0) {
+      hasNewRecordInThisGame = true;
+      const centerX = gameWidth / 2;
+      const centerY = gameHeight * 0.3;
+      createBestScorePopup(bestScore, centerX, centerY);
+
+      if (soundEffects.value === "on") {
+        explosionSound.currentTime = 0;
+        explosionSound.play();
+      }
+      createExplosion(centerX, centerY, "#ff00ff");
     }
+  }
 }
-// Создание границ
+
+function animateBestScore() {
+  if (Math.abs(displayedBestScore - bestScore) < 1) {
+    displayedBestScore = bestScore;
+    cancelAnimationFrame(bestScoreAnimationFrame);
+  } else {
+    displayedBestScore += (bestScore - displayedBestScore) * 0.1;
+    bestScoreAnimationFrame = requestAnimationFrame(animateBestScore);
+  }
+  document.getElementById("best-score").textContent = `BEST: ${Math.floor(
+    displayedBestScore
+  )}`;
+}
+
+function createBestScorePopup(points, x, y) {
+  const popup = document.createElement("div");
+  popup.className = "best-score-popup";
+  popup.textContent = `NEW BEST: ${points}`;
+  popup.style.left = `${x}px`;
+  popup.style.top = `${y}px`;
+  gameContainer.appendChild(popup);
+
+  setTimeout(() => {
+    popup.remove();
+  }, 1500);
+}
+
+function checkFieldOverflow() {
+  if (!gameActive || isCheckingLines) return false;
+
+  const totalArea = gameWidth * gameHeight;
+  let occupiedArea = 0;
+  const staticPieces = pieces.filter((piece) => piece !== currentPiece);
+
+  staticPieces.forEach((piece) => {
+    if (piece.bounds) {
+      const width = piece.bounds.max.x - piece.bounds.min.x;
+      const height = piece.bounds.max.y - piece.bounds.min.y;
+      occupiedArea += width * height;
+    }
+  });
+
+  const fillRatio = occupiedArea / totalArea;
+  if (fillRatio < 0.5) return false;
+
+  const sortedPieces = [...staticPieces].sort(
+    (a, b) => b.position.y - a.position.y
+  );
+  const bottomPieces = sortedPieces.slice(
+    0,
+    Math.floor(sortedPieces.length * 0.4)
+  );
+  if (bottomPieces.length < 3) return false;
+
+  const minDistance = 50;
+  const maxDistance = 250;
+  const adaptiveDistance =
+    minDistance +
+    (maxDistance - minDistance) * Math.max(0, (fillRatio - 0.5) / 0.4);
+
+  const piecesToRemove = new Set();
+  for (let i = 0; i < bottomPieces.length; i++) {
+    for (let j = i + 1; j < bottomPieces.length; j++) {
+      const dist = getDistance(bottomPieces[i], bottomPieces[j]);
+      if (dist <= adaptiveDistance) {
+        piecesToRemove.add(bottomPieces[i]);
+        piecesToRemove.add(bottomPieces[j]);
+      }
+    }
+  }
+
+  if (piecesToRemove.size === 0) return false;
+
+  removePiecesWithEffect(Array.from(piecesToRemove));
+
+  const centerX = gameWidth / 2;
+  const centerY = gameHeight * 0.7;
+  const clearScore = Math.floor(100 * piecesToRemove.size * fillRatio);
+  addScore(clearScore, "#FF5555", centerX, centerY);
+
+  if (soundEffects.value === "on") {
+    explosionSound.currentTime = 0;
+    explosionSound.play();
+  }
+  createExplosion(centerX, centerY, "#FF5555");
+
+  return true;
+}
+
+function findClusters(piecesArray, maxDistance) {
+  const clusters = [];
+  const processed = new Set();
+
+  for (const piece of piecesArray) {
+    if (processed.has(piece)) continue;
+
+    const cluster = [];
+    const queue = [piece];
+    processed.add(piece);
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+      cluster.push(current);
+
+      for (const other of piecesArray) {
+        if (processed.has(other)) continue;
+        const dist = getDistance(current, other);
+        if (dist <= maxDistance) {
+          processed.add(other);
+          queue.push(other);
+        }
+      }
+    }
+
+    if (cluster.length > 0) clusters.push(cluster);
+  }
+
+  return clusters;
+}
+
+function checkColorUnlocks() {
+  if (score >= 300 && unlockedColors < 4) {
+    unlockedColors = 4;
+    initColors();
+  } else if (score >= 500 && unlockedColors < 5) {
+    unlockedColors = 5;
+    initColors();
+  } else if (score >= 1000 && unlockedColors < 6) {
+    unlockedColors = 6;
+    initColors();
+  } else if (score >= 2000 && unlockedColors < 7) {
+    unlockedColors = 7;
+    initColors();
+  } else if (score >= 4000 && unlockedColors < 8) {
+    unlockedColors = 8;
+    initColors();
+  } else if (score >= 8000 && unlockedColors < 9) {
+    unlockedColors = 9;
+    initColors();
+  } else if (score >= 16000 && unlockedColors < 10) {
+    unlockedColors = 10;
+    initColors();
+  } else if (score >= 32000 && unlockedColors < 11) {
+    unlockedColors = 11;
+    initColors();
+  } else if (score >= 64000 && unlockedColors < 12) {
+    unlockedColors = 12;
+    initColors();
+  } else if (score >= 128000 && unlockedColors < 13) {
+    unlockedColors = 13;
+    initColors();
+  } else if (score >= 256000 && unlockedColors < 14) {
+    unlockedColors = 14;
+    initColors();
+  } else if (score >= 512000 && unlockedColors < 15) {
+    unlockedColors = 15;
+    initColors();
+  } else if (score >= 1024000 && unlockedColors < 16) {
+    unlockedColors = 16;
+    initColors();
+  }
+}
+
 const ground = Bodies.rectangle(
   gameWidth / 2,
   gameHeight + 50,
@@ -205,7 +335,6 @@ const rightWall = Bodies.rectangle(
   }
 );
 
-// Линия завершения игры (20% от верха)
 const gameOverLine = Bodies.rectangle(
   gameWidth / 2,
   gameHeight * 0.2,
@@ -231,10 +360,10 @@ function animateScore() {
   document.getElementById("score").textContent = `SCORE: ${Math.floor(
     displayedScore
   )}`;
+  updateBestScore();
   checkColorUnlocks();
 }
 
-// Создание эффекта взрыва
 function createExplosion(x, y, color) {
   const explosion = document.createElement("div");
   explosion.className = "explosion";
@@ -248,7 +377,6 @@ function createExplosion(x, y, color) {
   }, 500);
 }
 
-// Создание всплывающего текста
 function createScorePopup(x, y, points, color) {
   const popup = document.createElement("div");
   popup.className = "score-popup";
@@ -263,7 +391,6 @@ function createScorePopup(x, y, points, color) {
   }, 1000);
 }
 
-// Создание фигур с одинаковой площадью
 function createPiece() {
   if (!gameActive || !canSpawnNewPiece || isCheckingLines) return;
 
@@ -275,13 +402,17 @@ function createPiece() {
   let piece;
   const targetArea = baseArea;
 
-  // Точный расчет размеров для одинаковой площади
   if (shape === "circle") {
     const radius = Math.sqrt(targetArea / Math.PI);
     piece = Bodies.circle(x, 50, radius, {
       ...pieceMaterial,
       render: createSimpleStyle(color),
       sleepThreshold: 10,
+      render: {
+        fillStyle: color,
+        strokeStyle: "#FFFFFF",
+        lineWidth: 3,
+      },
     });
   } else if (shape === "square") {
     const side = Math.sqrt(targetArea);
@@ -290,6 +421,11 @@ function createPiece() {
       render: createSimpleStyle(color),
       chamfer: { radius: 5 },
       sleepThreshold: 10,
+      render: {
+        fillStyle: color,
+        strokeStyle: "#FFFFFF",
+        lineWidth: 3,
+      },
     });
   } else if (shape === "rectangle") {
     const width = Math.sqrt(targetArea) * 2;
@@ -299,6 +435,11 @@ function createPiece() {
       render: createSimpleStyle(color),
       chamfer: { radius: 5 },
       sleepThreshold: 10,
+      render: {
+        fillStyle: color,
+        strokeStyle: "#FFFFFF",
+        lineWidth: 3,
+      },
     });
   } else if (shape === "triangle") {
     const side = Math.sqrt((4 * targetArea * 0.8) / Math.sqrt(3));
@@ -306,6 +447,11 @@ function createPiece() {
       ...pieceMaterial,
       render: createSimpleStyle(color),
       sleepThreshold: 10,
+      render: {
+        fillStyle: color,
+        strokeStyle: "#FFFFFF",
+        lineWidth: 3,
+      },
     });
   } else if (shape === "pentagon") {
     const side = Math.sqrt((4 * targetArea * Math.tan(Math.PI / 5)) / 5);
@@ -313,6 +459,11 @@ function createPiece() {
       ...pieceMaterial,
       render: createSimpleStyle(color),
       sleepThreshold: 10,
+      render: {
+        fillStyle: color,
+        strokeStyle: "#FFFFFF",
+        lineWidth: 3,
+      },
     });
   } else if (shape === "hexagon") {
     const side = Math.sqrt((2 * targetArea) / (3 * Math.sqrt(3)));
@@ -320,6 +471,11 @@ function createPiece() {
       ...pieceMaterial,
       render: createSimpleStyle(color),
       sleepThreshold: 10,
+      render: {
+        fillStyle: color,
+        strokeStyle: "#FFFFFF",
+        lineWidth: 3,
+      },
     });
   } else if (shape === "trapezoid") {
     const width = Math.sqrt(targetArea * 1.5);
@@ -334,6 +490,11 @@ function createPiece() {
       ...pieceMaterial,
       render: createSimpleStyle(color),
       sleepThreshold: 10,
+      render: {
+        fillStyle: color,
+        strokeStyle: "#FFFFFF",
+        lineWidth: 3,
+      },
     });
   } else if (shape === "rhombus") {
     const width = Math.sqrt(targetArea * 3.5);
@@ -348,6 +509,11 @@ function createPiece() {
       ...pieceMaterial,
       render: createSimpleStyle(color),
       sleepThreshold: 10,
+      render: {
+        fillStyle: color,
+        strokeStyle: "#FFFFFF",
+        lineWidth: 3,
+      },
     });
   } else if (shape === "oval") {
     const width = Math.sqrt(targetArea * 3);
@@ -364,10 +530,14 @@ function createPiece() {
       ...pieceMaterial,
       render: createSimpleStyle(color),
       sleepThreshold: 10,
+      render: {
+        fillStyle: color,
+        strokeStyle: "#FFFFFF",
+        lineWidth: 3,
+      },
     });
   }
 
-  // Добавляем цвет к объекту фигуры для проверки
   piece.color = color;
   piece.shapeType = shape;
 
@@ -376,11 +546,10 @@ function createPiece() {
   currentPiece = piece;
 }
 
-// Добавление очков с анимацией
 function addScore(points, color, x, y) {
   if (points <= 0) return;
   if (points > 1000) points = 1000;
-  
+
   score += points;
   createScorePopup(x, y, points, color);
   animateScore();
@@ -391,11 +560,10 @@ function checkLines() {
 
   isCheckingLines = true;
 
-  // Группируем фигуры по цветам (исключая текущую фигуру игрока)
   const colorGroups = {};
   const piecesToCheck = pieces.filter((piece) => piece !== currentPiece);
+  const wasCleared = checkFieldOverflow();
 
-  // Собираем все фигуры одного цвета
   piecesToCheck.forEach((piece) => {
     if (!colorGroups[piece.color]) {
       colorGroups[piece.color] = [];
@@ -403,20 +571,16 @@ function checkLines() {
     colorGroups[piece.color].push(piece);
   });
 
-  // Проверяем каждую группу цветов
   for (const color in colorGroups) {
     const piecesOfColor = colorGroups[color];
     const clusters = [];
     const processedPieces = new Set();
 
-    // Находим кластеры близких фигур с помощью BFS
     for (let i = 0; i < piecesOfColor.length; i++) {
       const piece = piecesOfColor[i];
 
-      // Если фигура уже в кластере - пропускаем
       if (processedPieces.has(piece)) continue;
 
-      // Создаем новый кластер
       const cluster = [];
       const queue = [piece];
       processedPieces.add(piece);
@@ -425,11 +589,9 @@ function checkLines() {
         const currentPiece = queue.shift();
         cluster.push(currentPiece);
 
-        // Ищем соседей для текущей фигуры
         for (let j = 0; j < piecesOfColor.length; j++) {
           const neighborPiece = piecesOfColor[j];
 
-          // Если соседняя фигура еще не обработана и достаточно близко
           if (
             !processedPieces.has(neighborPiece) &&
             arePiecesConnected(currentPiece, neighborPiece)
@@ -445,21 +607,15 @@ function checkLines() {
       }
     }
 
-    // Проверяем кластеры на размер
     for (let i = 0; i < clusters.length; i++) {
       const cluster = clusters[i];
 
-      // Если в кластере 5 и более фигур - удаляем
       if (cluster.length >= 5) {
-        // Проверяем, не входит ли текущая фигура игрока в кластер
         let playerPieceInCluster = false;
         if (currentPiece) {
           playerPieceInCluster = cluster.includes(currentPiece);
         }
-
-        // Если фигура игрока не в кластере, удаляем кластер
         if (!playerPieceInCluster) {
-          // Сначала получаем позицию центра кластера для эффектов
           const centerX =
             cluster.reduce((sum, piece) => sum + piece.position.x, 0) /
             cluster.length;
@@ -467,24 +623,22 @@ function checkLines() {
             cluster.reduce((sum, piece) => sum + piece.position.y, 0) /
             cluster.length;
 
-          // Затем удаляем все фигуры кластера
           cluster.forEach((piece) => {
             World.remove(engine.world, piece);
             const index = pieces.indexOf(piece);
             if (index > -1) pieces.splice(index, 1);
           });
 
-          // Добавляем очки за уничтожение кластер
           const clusterScore = Math.floor(400 + Math.random() * 200);
           addScore(clusterScore, color, centerX, centerY);
 
-          // Воспроизводим звук взрыва
+          navigator.vibrate(60);
+
           if (soundEffects.value === "on") {
             explosionSound.currentTime = 0;
             explosionSound.play();
           }
 
-          // Создаем эффект взрыва
           createExplosion(centerX, centerY, color);
         }
       }
@@ -495,18 +649,14 @@ function checkLines() {
   checkGameOver();
 }
 
-// Проверяет, соединены ли две фигуры (учитывает форму и размер)
 function arePiecesConnected(pieceA, pieceB) {
-  // Используем встроенные bounds от Matter.js
   const boundsA = pieceA.bounds;
   const boundsB = pieceB.bounds;
 
-  // Расстояние между центрами
   const dx = pieceA.position.x - pieceB.position.x;
   const dy = pieceA.position.y - pieceB.position.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
-  // Определяем примерный размер каждой фигуры
   const sizeA = Math.max(
     boundsA.max.x - boundsA.min.x,
     boundsA.max.y - boundsA.min.y
@@ -516,41 +666,24 @@ function arePiecesConnected(pieceA, pieceB) {
     boundsB.max.y - boundsB.min.y
   );
 
-  // Фигуры считаются соединенными, если расстояние между их границами меньше порога
-  const connectionThreshold = 5; // пикселей
+  const connectionThreshold = 5;
   return distance < (sizeA + sizeB) / 2 + connectionThreshold;
 }
 
-// Вспомогательная функция для расчета расстояния между фигурами
 function getDistance(pieceA, pieceB) {
-  // Для кругов используем радиус
-  if (pieceA.circleRadius && pieceB.circleRadius) {
-    const dx = pieceA.position.x - pieceB.position.x;
-    const dy = pieceA.position.y - pieceB.position.y;
-    return (
-      Math.sqrt(dx * dx + dy * dy) - pieceA.circleRadius - pieceB.circleRadius
-    );
-  }
-
-  // Для других фигур используем примерный размер
-  const sizeA = pieceA.width || pieceA.circleRadius || 40;
-  const sizeB = pieceB.width || pieceB.circleRadius || 40;
   const dx = pieceA.position.x - pieceB.position.x;
   const dy = pieceA.position.y - pieceB.position.y;
-  return Math.sqrt(dx * dx + dy * dy) - sizeA / 2 - sizeB / 2;
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
-// Проверка завершения игры
 function checkGameOver() {
   if (!gameActive) return;
 
-  // Проверяем только статичные фигуры (исключая текущую падающую фигуру)
   for (let i = 0; i < pieces.length; i++) {
     const piece = pieces[i];
-    // Игнорируем текущую падающую фигуру
+
     if (piece === currentPiece) continue;
 
-    // Проверяем, достигла ли фигура линии проигрыша
     if (piece.position.y < gameHeight * 0.2) {
       endGame();
       break;
@@ -558,43 +691,39 @@ function checkGameOver() {
   }
 }
 
-// Завершение игры
 function endGame() {
   gameActive = false;
   gameOverDisplay.style.display = "block";
   restartBtn.style.display = "block";
+  if (navigator.vibrate) navigator.vibrate(60);
   clearInterval(pieceInterval);
   clearInterval(checkLinesInterval);
 }
 
-// Перезапуск игры
 function restartGame() {
-  // Удаляем все фигуры
   Composite.clear(engine.world, false);
   pieces.length = 0;
+  hasNewRecordInThisGame = false;
+  bestScore = localStorage.getItem("bestScore") || 0;
+  bestScore = localStorage.getItem("bestScore") || 0;
+  document.getElementById("best-score").textContent = `BEST: ${bestScore}`;
 
-  // Восстанавливаем границы
   World.add(engine.world, [ground, leftWall, rightWall, gameOverLine]);
 
-  // Сбрасываем счет
   score = 0;
   displayedScore = 0;
   unlockedColors = 3;
   document.getElementById("score").textContent = `SCORE: ${score}`;
 
-  // Скрываем сообщения
   gameOverDisplay.style.display = "none";
   restartBtn.style.display = "none";
 
-  // Запускаем игру
   gameActive = true;
   currentPiece = null;
   canSpawnNewPiece = true;
 
-  // Обновляем настройки
   initColors();
 
-  // Перезапускаем интервалы
   clearInterval(pieceInterval);
   clearInterval(checkLinesInterval);
   pieceInterval = setInterval(() => {
@@ -605,7 +734,6 @@ function restartGame() {
   checkLinesInterval = setInterval(checkLines, 100);
 }
 
-// Управление с клавиатуры
 document.addEventListener("keydown", (e) => {
   if (!gameActive || !currentPiece) return;
 
@@ -620,7 +748,6 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// Управление касанием для мобильных устройств
 gameContainer.addEventListener("touchstart", (e) => {
   if (!gameActive || !currentPiece) return;
 
@@ -638,13 +765,11 @@ gameContainer.addEventListener("touchmove", (e) => {
   const diffY = touchY - touchStartY;
 
   if (Math.abs(diffX) > Math.abs(diffY)) {
-    // Горизонтальный свайп - движение влево/вправо
     Body.setVelocity(currentPiece, {
       x: diffX * 0.2,
       y: currentPiece.velocity.y,
     });
   } else {
-    // Вертикальный свайп - вращение
     Body.setAngularVelocity(currentPiece, diffY * 0.002);
   }
 
@@ -653,7 +778,6 @@ gameContainer.addEventListener("touchmove", (e) => {
   e.preventDefault();
 });
 
-// Обработчик столкновений
 Events.on(engine, "collisionStart", (event) => {
   if (!gameActive || isCheckingLines) return;
 
@@ -663,26 +787,24 @@ Events.on(engine, "collisionStart", (event) => {
   for (let i = 0; i < pairs.length; i++) {
     const pair = pairs[i];
 
-    // Если текущая фигура коснулась земли или другой фигуры
     if (
       (pair.bodyA === currentPiece || pair.bodyB === currentPiece) &&
       (pair.bodyA === ground ||
         pair.bodyB === ground ||
         (pieces.includes(pair.bodyA) && pieces.includes(pair.bodyB)))
     ) {
-      // Воспроизводим звук столкновения
       if (soundEffects.value === "on") {
         collisionSound.currentTime = 0;
         collisionSound.play();
-      } if (!collisionProcessed) { // Обрабатываем только первое столкновение
+      }
+      if (!collisionProcessed) {
         collisionProcessed = true;
-        
+
         if (soundEffects.value === "on") {
           collisionSound.currentTime = 0;
           collisionSound.play();
         }
 
-        // Очки за касание: 75-125
         const collisionScore = Math.floor(10 + Math.random() * 5);
         addScore(
           collisionScore,
@@ -701,21 +823,20 @@ Events.on(engine, "collisionStart", (event) => {
     }
   }
 });
+restartBtn.addEventListener("click", () => {
+  if (navigator.vibrate) navigator.vibrate(40);
+  restartGame();
+});
 
-// Кнопка перезапуска
-restartBtn.addEventListener("click", restartGame);
-
-// Кнопка настроек
 settingsBtn.addEventListener("click", () => {
+  if (navigator.vibrate) navigator.vibrate(40);
   settingsPanel.style.display = "block";
 });
 
-// Закрытие настроек
 closeSettings.addEventListener("click", () => {
   settingsPanel.style.display = "none";
 });
 
-// Управление музыкой
 musicToggle.addEventListener("change", () => {
   if (musicToggle.value === "on") {
     bgMusic.play();
@@ -724,10 +845,33 @@ musicToggle.addEventListener("change", () => {
   }
 });
 
-// Запуск игры
+window.addEventListener("gamepadconnected", (e) => {
+  console.log("Gamepad connected:", e.gamepad);
+
+  function gamepadLoop() {
+    const gamepad = navigator.getGamepads()[0];
+    if (!gamepad) return;
+
+    if (gamepad.buttons[0].pressed && currentPiece) {
+      Body.setVelocity(currentPiece, { x: 0, y: 5 });
+    }
+
+    if (gamepad.axes[0] > 0.5 && currentPiece) {
+      Body.setVelocity(currentPiece, { x: 10, y: 0 });
+    }
+
+    requestAnimationFrame(gamepadLoop);
+  }
+
+  gamepadLoop();
+});
+
 function startGame() {
   initColors();
-
+  bestScore = parseInt(localStorage.getItem("bestScore")) || 0;
+  displayedBestScore = bestScore;
+  document.getElementById("best-score").textContent = `BEST: ${bestScore}`;
+  hasNewRecordInThisGame = false;
   if (musicToggle.value === "on") {
     bgMusic.play();
   }
@@ -735,23 +879,24 @@ function startGame() {
   Engine.run(engine);
   Render.run(render);
 
-  // Новая фигура каждые 1 секунду
   pieceInterval = setInterval(() => {
     if (canSpawnNewPiece) {
       createPiece();
     }
   }, 1000);
 
-  // Проверка линий каждые 100 мс
   checkLinesInterval = setInterval(checkLines, 100);
 }
 
-// Обработчик изменения размера окна
+window.addEventListener("deviceorientation", (e) => {
+  const tilt = e.gamma / 10;
+  document.getElementById("bg-layer").style.transform = `translateX(${tilt}px)`;
+});
+
 window.addEventListener("resize", () => {
   render.options.width = gameWrapper.clientWidth;
   render.options.height = gameWrapper.clientHeight;
   Render.setPixelRatio(render, window.devicePixelRatio);
 });
 
-// Старт игры
 startGame();
