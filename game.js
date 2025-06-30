@@ -872,9 +872,7 @@ function startGame() {
   displayedBestScore = bestScore;
   document.getElementById("best-score").textContent = `BEST: ${bestScore}`;
   hasNewRecordInThisGame = false;
-  if (musicToggle.value === "on") {
-    bgMusic.play();
-  }
+  bgMusic.play();
 
   Engine.run(engine);
   Render.run(render);
