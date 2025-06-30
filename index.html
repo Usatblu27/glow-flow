@@ -5,13 +5,17 @@
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <title>glow flow</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <div id="game-wrapper">
       <div id="game-container"></div>
-      <div id="score">SCORE: 0</div>
+      <div id="scores-container">
+        <div id="score">SCORE: 0</div>
+        <div id="best-score">BEST: 0</div>
+      </div>
       <div id="game-over">GAME OVER</div>
       <div id="restart-btn">RESTART</div>
       <div id="settings-btn">&#9881;</div>
