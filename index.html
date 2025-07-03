@@ -563,7 +563,7 @@
               if (piece) pieces.push(piece);
             }
             canSpawn = true;
-          }, 300);
+          }, 1000);
         }
       }
 
@@ -577,8 +577,8 @@
           }
           return true;
         });
-        if (pieces.length < 5) {
-          const countToCreate = 5 - pieces.length;
+        if (pieces.length < 3) {
+          const countToCreate = 3 - pieces.length;
           const startX = window.innerWidth * 0.1;
           const stepX = window.innerWidth * 0.2;
 
@@ -594,7 +594,7 @@
       }
 
       window.addEventListener("load", () => {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 3; i++) {
           setTimeout(() => {
             const piece = createPiece();
             if (piece) pieces.push(piece);
