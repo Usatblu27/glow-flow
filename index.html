@@ -360,7 +360,7 @@
         gravity: 0.1,
         baseArea: 1500,
         triggerYPosition: window.innerHeight * 0.3,
-        spawnDelay: 300,
+        spawnDelay: 1000,
       };
 
       let pieces = [];
@@ -562,7 +562,7 @@
               if (piece) pieces.push(piece);
             }
             canSpawn = true;
-          }, 300);
+          }, 1000);
         }
       }
 
@@ -576,24 +576,24 @@
           }
           return true;
         });
-        if (pieces.length < 5) {
-          const countToCreate = 5 - pieces.length;
+        if (pieces.length < 3) {
+          const countToCreate = 3 - pieces.length;
           const startX = window.innerWidth * 0.1;
           const stepX = window.innerWidth * 0.2;
 
           for (let i = 0; i < countToCreate; i++) {
             setTimeout(() => {
-              const piece = createPiece(startX + stepX * (i % 5));
+              const piece = createPiece(startX + stepX * (i % 3));
               if (piece) {
                 pieces.push(piece);
               }
-            }, i * 200);
+            }, i * 1000);
           }
         }
       }
 
       window.addEventListener("load", () => {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 3; i++) {
           setTimeout(() => {
             const piece = createPiece();
             if (piece) pieces.push(piece);
