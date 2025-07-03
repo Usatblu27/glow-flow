@@ -344,7 +344,7 @@
 
       const engine = Matter.Engine.create({
         enableSleeping: true,
-        gravity: { x: 0, y: 0.1 },
+        gravity: { x: 0, y: 0.03 },
       });
 
       const pieceMaterial = {
@@ -361,7 +361,7 @@
         targetFPS: 60,
         gravity: 0.1,
         baseArea: 1500,
-        triggerYPosition: window.innerHeight * 0.3, // Более высокая точка триггера
+        triggerYPosition: window.innerHeight * 0.3,
         spawnDelay: 300,
       };
 
@@ -544,7 +544,6 @@
       }
 
       function updatePieces() {
-        // Удаляем только фигуры за пределами экрана
         pieces = pieces.filter((piece) => {
           if (piece.position.y > window.innerHeight + 100) {
             Matter.Composite.remove(engine.world, piece);
@@ -553,20 +552,18 @@
           return true;
         });
 
-        // Постоянно добавляем новые фигуры, когда старые достигают середины
         if (
           pieces.some((p) => p.position.y >= config.triggerYPosition) &&
           canSpawn
         ) {
           canSpawn = false;
           setTimeout(() => {
-            // Добавляем 1-2 новые фигуры вместо полного обновления
             for (let i = 0; i < 2; i++) {
               const piece = createPiece();
               if (piece) pieces.push(piece);
             }
             canSpawn = true;
-          }, 300); // Небольшая задержка между волнами
+          }, 300);
         }
       }
 
@@ -597,12 +594,11 @@
       }
 
       window.addEventListener("load", () => {
-        // Создаем первые 5 фигур
         for (let i = 0; i < 5; i++) {
           setTimeout(() => {
             const piece = createPiece();
             if (piece) pieces.push(piece);
-          }, i * 200); // Небольшая задержка между созданиями для эффекта "дождя"
+          }, i * 200);
         }
         gameLoop();
       });
