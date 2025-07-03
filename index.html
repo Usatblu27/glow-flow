@@ -324,13 +324,6 @@
           '<h1 style="color:red">Error: Physics engine failed to load</h1>';
         throw new Error("Matter.js not loaded");
       }
-      const physicsContainer = document.getElementById("physics-container");
-      if (!physicsContainer) {
-        document.getElementById("menu-container").innerHTML =
-          '<h1 style="color:red">Error: Physics container not found</h1>';
-        throw new Error("Physics container not found");
-      }
-
       const {
         Engine,
         Render,
@@ -341,6 +334,13 @@
         Composite,
         Runner,
       } = Matter;
+
+      const physicsContainer = document.getElementById("physics-container");
+      if (!physicsContainer) {
+        document.getElementById("menu-container").innerHTML =
+          '<h1 style="color:red">Error: Physics container not found</h1>';
+        throw new Error("Physics container not found");
+      }
 
       const engine = Matter.Engine.create({
         enableSleeping: true,
@@ -361,11 +361,8 @@
         targetFPS: 60,
         gravity: 0.1,
         baseArea: 1500,
-        triggerYPosition: window.innerHeight * 0.3,
+        triggerYPosition: window.innerHeight * 0.3, // Более высокая точка триггера
         spawnDelay: 300,
-        maxPieces: 15,
-        minPieces: 5,
-        spawnBatch: 2,
       };
 
       let pieces = [];
@@ -380,23 +377,8 @@
           wireframes: false,
           background: "#302b63",
           showSleeping: false,
-          showDebug: false,
-          showBounds: false,
-          showVelocity: false,
-          showCollisions: false,
-          showAxes: false,
-          showPositions: false,
-          showAngleIndicator: false,
-          showIds: false,
-          showShadows: false,
         },
       });
-
-      const MAX_PIECES = 30;
-
-      engine.positionIterations = 1;
-      engine.velocityIterations = 1;
-      engine.constraintIterations = 1;
 
       Matter.Render.run(render);
 
@@ -562,6 +544,7 @@
       }
 
       function updatePieces() {
+        // Удаляем только фигуры за пределами экрана
         pieces = pieces.filter((piece) => {
           if (piece.position.y > window.innerHeight + 100) {
             Matter.Composite.remove(engine.world, piece);
@@ -570,19 +553,20 @@
           return true;
         });
 
-        if (pieces.length < config.minPieces && canSpawn) {
+        // Постоянно добавляем новые фигуры, когда старые достигают середины
+        if (
+          pieces.some((p) => p.position.y >= config.triggerYPosition) &&
+          canSpawn
+        ) {
           canSpawn = false;
           setTimeout(() => {
-            const needed = Math.min(
-              config.spawnBatch,
-              config.maxPieces - pieces.length
-            );
-            for (let i = 0; i < needed; i++) {
+            // Добавляем 1-2 новые фигуры вместо полного обновления
+            for (let i = 0; i < 2; i++) {
               const piece = createPiece();
               if (piece) pieces.push(piece);
             }
             canSpawn = true;
-          }, config.spawnDelay);
+          }, 300); // Небольшая задержка между волнами
         }
       }
 
@@ -613,11 +597,12 @@
       }
 
       window.addEventListener("load", () => {
+        // Создаем первые 5 фигур
         for (let i = 0; i < 5; i++) {
           setTimeout(() => {
             const piece = createPiece();
             if (piece) pieces.push(piece);
-          }, i * 200);
+          }, i * 200); // Небольшая задержка между созданиями для эффекта "дождя"
         }
         gameLoop();
       });
@@ -645,31 +630,6 @@
           x: window.innerWidth + 50,
           y: window.innerHeight / 2,
         });
-      });
-
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-          Matter.Render.stop(render);
-        } else {
-          Matter.Render.run(render);
-        }
-      });
-
-      let resizeTimeout;
-      window.addEventListener("resize", () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-          render.options.width = window.innerWidth;
-          render.options.height = window.innerHeight;
-          Matter.Body.setPosition(leftWall, {
-            x: -50,
-            y: window.innerHeight / 2,
-          });
-          Matter.Body.setPosition(rightWall, {
-            x: window.innerWidth + 50,
-            y: window.innerHeight / 2,
-          });
-        }, 100);
       });
     </script>
   </body>
