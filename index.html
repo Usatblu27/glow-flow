@@ -358,7 +358,7 @@
       };
 
       const config = {
-        targetFPS: 60,
+        targetFPS: 30,
         gravity: 0.1,
         baseArea: 1500,
         triggerYPosition: window.innerHeight * 0.3,
@@ -538,7 +538,7 @@
       }
 
       function gameLoop() {
-        Matter.Engine.update(engine, 1000 / 60);
+        Matter.Engine.update(engine, 1000 / 30);
         updatePieces();
         requestAnimationFrame(gameLoop);
       }
