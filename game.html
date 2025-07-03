@@ -454,6 +454,12 @@
         }
       }
 
+      function vibrate(duration = 30) {
+        if ("vibrate" in navigator) {
+          navigator.vibrate(duration);
+        }
+      }
+
       function animateBestScore() {
         if (Math.abs(displayedBestScore - bestScore) < 1) {
           displayedBestScore = bestScore;
@@ -1176,7 +1182,7 @@
       });
 
       Events.on(engine, "collisionStart", (event) => {
-        if (!gameActive) return;
+        if (!gameActive || isCheckingLines) return;
 
         const pairs = event.pairs;
         let collisionProcessed = false;
@@ -1191,9 +1197,7 @@
               (pieces.includes(pair.bodyA) && pieces.includes(pair.bodyB)))
           ) {
             playSound(collisionSound);
-            if ("vibrate" in navigator) {
-              navigator.vibrate(50);
-            }
+
             if (!collisionProcessed) {
               collisionProcessed = true;
               resetCombo();
@@ -1219,27 +1223,6 @@
       restartBtn.addEventListener("click", () => {
         vibrate();
         restartGame();
-      });
-
-      function vibrate(duration = 30) {
-        if ("vibrate" in navigator) {
-          navigator.vibrate(duration);
-        }
-      }
-
-      document.getElementById("play-btn").addEventListener("click", () => {
-        vibrate(50);
-        window.location.href = "game.html";
-      });
-
-      document.getElementById("stats-btn").addEventListener("click", () => {
-        vibrate(30);
-        window.location.href = "stats.html";
-      });
-
-      document.getElementById("settings-btn").addEventListener("click", () => {
-        vibrate(30);
-        alert("Settings will be available in the next update!");
       });
 
       window.addEventListener("resize", () => {
@@ -1284,4 +1267,3 @@
     </script>
   </body>
 </html>
-
