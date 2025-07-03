@@ -324,8 +324,8 @@
       const explosionSound = document.getElementById("explosion-sound");
 
       bgMusic.volume = 0.2;
-      collisionSound.volume = 0.3;
-      explosionSound.volume = 0.3;
+      collisionSound.volume = 0.5;
+      explosionSound.volume = 0.5;
 
       const gameWidth = gameWrapper.clientWidth;
       const gameHeight = gameWrapper.clientHeight;
@@ -422,11 +422,15 @@
         }
       }
 
-      function vibrate() {
+      function vibrate(pattern = 50) {
         const vibrationSetting =
           localStorage.getItem("vibrationEnabled") !== "false";
         if (vibrationSetting && "vibrate" in navigator) {
-          navigator.vibrate(50);
+          if (typeof pattern === "number") {
+            navigator.vibrate(pattern);
+          } else {
+            navigator.vibrate([30, 50, 30]);
+          }
         }
       }
 
@@ -1257,3 +1261,4 @@
     </script>
   </body>
 </html>
+
