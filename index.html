@@ -345,9 +345,10 @@
 
       const engine = Matter.Engine.create({
         enableSleeping: true,
-        gravity: { x: 0, y: 0.1 },
-        positionIterations: 8,
-        velocityIterations: 6,
+        gravity: { x: 0, y: 0.05 },
+        positionIterations: 0.1,
+        velocityIterations: 0.1,
+        constraintIterations: 0.1,
       });
 
       const pieceMaterial = {
