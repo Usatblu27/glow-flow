@@ -454,12 +454,6 @@
         }
       }
 
-      function vibrate(duration = 30) {
-        if ("vibrate" in navigator) {
-          navigator.vibrate(duration);
-        }
-      }
-
       function animateBestScore() {
         if (Math.abs(displayedBestScore - bestScore) < 1) {
           displayedBestScore = bestScore;
