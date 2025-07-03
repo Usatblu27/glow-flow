@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta
+      name="description"
+      content="Glow Flow - Exciting arcade game. Collect colorful figures and set records!" />
+    <meta
+      name="keywords"
+      content="game, arcade, physics, particles, glow flow, browser game, indie" />
+    <meta name="author" content="Usatenko Daniil" />
+    <meta property="og:title" content="Glow Flow - Arcade game" />
+    <meta
+      property="og:description"
+      content="A fun game of destroying figures" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://usatblu27.github.io/glow-flow/" />
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon" />
+    <meta
+      property="og:image"
+      content="https://usatblu27.github.io/glow-flow/icons/favicon.ico/" />
+    <meta name="theme-color" content="#0f0c29" />
+    <title>GLOW FLOW</title>
+    <link rel="manifest" href="manifest.json" />
+    <style>
+      * {
+        user-select: none;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --magenta-color: #ff00ff;
+        --cyan-color: #00ffff;
+        --orange-color: #ffa500;
+      }
+
+      body {
+        overflow: hidden;
+        width: 100vw;
+        height: 100vh;
+        font-family: "Arial", sans-serif;
+        touch-action: manipulation;
+        position: fixed;
+        background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+      }
+
+      #menu-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        text-align: center;
+        width: 100%;
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: clamp(2.5rem, 10vw, 4rem);
+        margin-bottom: 2rem;
+        color: var(--cyan-color);
+        text-shadow: 0 0 10px var(--cyan-color), 0 0 20px var(--cyan-color);
+        animation: glow-pulse 2s infinite alternate;
+        display: flex;
+        justify-content: center;
+        gap: 0.2em;
+      }
+
+      h1 span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(-50px);
+        animation: letter-appear 0.5s forwards;
+      }
+
+      .btn-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 30px;
+      }
+
+      .btn {
+        border-radius: 8px;
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 220px;
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(200px) scale(0.8);
+      }
+
+      .btn-play {
+        animation: btn-appear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+            forwards,
+          play-pulse 2s infinite ease-in-out;
+        background: rgba(234, 0, 255, 0.2);
+        color: var(--magenta-color);
+        border: 2px solid var(--magenta-color);
+        text-shadow: 0 0 5px var(--magenta-color);
+        box-shadow: 0 0 15px var(--magenta-color);
+        animation-delay: 0.8s;
+      }
+
+      .btn-statistics {
+        animation: btn-appear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+          forwards;
+        background: rgba(0, 255, 255, 0.2);
+        color: var(--cyan-color);
+        border: 2px solid var(--cyan-color);
+        text-shadow: 0 0 5px var(--cyan-color);
+        box-shadow: 0 0 15px var(--cyan-color);
+        animation-delay: 1s;
+      }
+
+      .btn-settings {
+        animation: btn-appear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+          forwards;
+        background: rgba(255, 165, 0, 0.2);
+        color: var(--orange-color);
+        border: 2px solid var(--orange-color);
+        text-shadow: 0 0 5px var(--orange-color);
+        box-shadow: 0 0 15px var(--orange-color);
+        animation-delay: 1.2s;
+      }
+
+      .btn-play:hover {
+        background: rgba(234, 0, 255, 0.445);
+        transform: scale(1.05);
+        box-shadow: 0 0 25px var(--magenta-color),
+          0 0 35px rgba(234, 0, 255, 0.2);
+      }
+
+      .btn-statistics:hover {
+        background: rgba(0, 255, 255, 0.4);
+        transform: scale(1.05);
+        box-shadow: 0 0 25px var(--cyan-color), 0 0 35px rgba(0, 255, 255, 0.5);
+      }
+
+      .btn-settings:hover {
+        background: rgba(255, 165, 0, 0.4);
+        transform: scale(1.05);
+        box-shadow: 0 0 25px var(--orange-color),
+          0 0 35px rgba(255, 165, 0, 0.5);
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(0, 255, 255, 0.2),
+          transparent
+        );
+        transition: 0.5s;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          to bottom right,
+          transparent,
+          transparent,
+          transparent,
+          rgba(0, 255, 255, 0.1),
+          transparent
+        );
+        transform: rotate(30deg);
+        animation: btn-shine 3s infinite;
+      }
+
+      #physics-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      .copyright {
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.8rem;
+        z-index: 10;
+        animation: fade-in 2s forwards;
+        pointer-events: none;
+      }
+
+      @keyframes glow-pulse {
+        from {
+          text-shadow: 0 0 10px var(--cyan-color), 0 0 20px var(--cyan-color);
+        }
+        to {
+          text-shadow: 0 0 15px var(--cyan-color), 0 0 30px var(--cyan-color),
+            0 0 40px var(--cyan-color);
+        }
+      }
+
+      @keyframes play-pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 15px var(--magenta-color);
+          transform: scale(1);
+        }
+        50% {
+          box-shadow: 0 0 40px var(--magenta-color),
+            0 0 60px rgba(234, 0, 255, 0.7);
+          transform: scale(1.05);
+        }
+      }
+
+      @keyframes btn-shine {
+        from {
+          transform: rotate(30deg) translate(-30%, -30%);
+        }
+        to {
+          transform: rotate(30deg) translate(30%, 30%);
+        }
+      }
+
+      @keyframes btn-appear {
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 0.7;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes letter-appear {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="physics-container"></div>
+    <div id="menu-container">
+      <h1 id="title"></h1>
+      <div class="btn-container">
+        <button class="btn-play btn" id="play-btn">PLAY</button>
+        <button class="btn-statistics btn" id="stats-btn">STATISTICS</button>
+        <button class="btn-settings btn" id="settings-btn">SETTINGS</button>
+      </div>
+    </div>
+    <div class="copyright">
+      © 2025 [Daniil Usatenko/Glow Flow]. All rights reserved.
+    </div>
+
+    <audio id="bg-music" loop>
+      <source src="audio/bg-music.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="collision-sound">
+      <source src="audio/collision.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="explosion-sound">
+      <source src="audio/explosion.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        const title = document.getElementById("title");
+        const text = "GLOW FLOW";
+
+        text.split("").forEach((letter, i) => {
+          const span = document.createElement("span");
+          span.textContent = letter === " " ? "" : letter;
+          span.style.animationDelay = `${i * 0.1}s`;
+          title.appendChild(span);
+        });
+
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            const piece = createPiece();
+            if (piece) pieces.push(piece);
+          }, i * 200);
+        }
+        gameLoop();
+      });
+
+      if (typeof Matter === "undefined") {
+        document.getElementById("menu-container").innerHTML =
+          '<h1 style="color:red">Error: Physics engine failed to load</h1>';
+        throw new Error("Matter.js not loaded");
+      }
+
+      const {
+        Engine,
+        Render,
+        World,
+        Bodies,
+        Body,
+        Vertices,
+        Composite,
+        Runner,
+      } = Matter;
+
+      const physicsContainer = document.getElementById("physics-container");
+      if (!physicsContainer) {
+        document.getElementById("menu-container").innerHTML =
+          '<h1 style="color:red">Error: Physics container not found</h1>';
+        throw new Error("Physics container not found");
+      }
+
+      const engine = Matter.Engine.create({
+        enableSleeping: true,
+        gravity: { x: 0, y: 0.1 },
+      });
+
+      const pieceMaterial = {
+        friction: 0.001,
+        restitution: 0.2,
+        density: 0.001,
+        render: { strokeStyle: "#FFFFFF", lineWidth: 3 },
+      };
+
+      const config = {
+        targetFPS: 60,
+        gravity: 0.1,
+        baseArea: 1500,
+        triggerYPosition: window.innerHeight * 0.3,
+        spawnDelay: 300,
+      };
+
+      let pieces = [];
+      let canSpawn = true;
+
+      const render = Matter.Render.create({
+        element: physicsContainer,
+        engine: engine,
+        options: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+          wireframes: false,
+          background: "#302b63",
+          showSleeping: false,
+        },
+      });
+
+      Matter.Render.run(render);
+
+      const wallOptions = { isStatic: true, render: { visible: false } };
+      const leftWall = Matter.Bodies.rectangle(
+        -50,
+        window.innerHeight / 2,
+        100,
+        window.innerHeight * 2,
+        wallOptions
+      );
+      const rightWall = Matter.Bodies.rectangle(
+        window.innerWidth + 50,
+        window.innerHeight / 2,
+        100,
+        window.innerHeight * 2,
+        wallOptions
+      );
+      Matter.World.add(engine.world, [leftWall, rightWall]);
+
+      const runner = Matter.Runner.create();
+      Matter.Runner.run(runner, engine);
+
+      const colors = [
+        "#FE0000",
+        "#3FFF0F",
+        "#005DFF",
+        "#F5FF00",
+        "#FF009C",
+        "#01FFE5",
+        "#FF9C00",
+        "#C500FF",
+        "#960000",
+        "#259609",
+        "#00389C",
+        "#999E00",
+        "#99005E",
+        "#019C8C",
+        "#965C00",
+        "#770099",
+      ];
+
+      const shapes = [
+        "circle",
+        "square",
+        "rectangle",
+        "triangle",
+        "pentagon",
+        "hexagon",
+        "trapezoid",
+        "rhombus",
+        "oval",
+      ];
+
+      function createPiece() {
+        const x = Math.random() * window.innerWidth;
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const targetArea = 1500;
+
+        let piece;
+
+        if (shape === "circle") {
+          const radius = Math.sqrt(targetArea / Math.PI);
+          piece = Matter.Bodies.circle(x, -radius, radius, {
+            ...pieceMaterial,
+            render: { ...pieceMaterial.render, fillStyle: color },
+          });
+        } else if (shape === "square") {
+          const side = Math.sqrt(targetArea);
+          piece = Matter.Bodies.rectangle(x, -side / 2, side, side, {
+            ...pieceMaterial,
+            chamfer: { radius: 5 },
+            render: { ...pieceMaterial.render, fillStyle: color },
+          });
+        } else if (shape === "rectangle") {
+          const width = Math.sqrt(targetArea) * 2;
+          const height = targetArea / width;
+          piece = Matter.Bodies.rectangle(x, -height / 2, width, height, {
+            ...pieceMaterial,
+            chamfer: { radius: 5 },
+            render: { ...pieceMaterial.render, fillStyle: color },
+          });
+        } else if (shape === "triangle") {
+          const side = Math.sqrt((4 * targetArea * 0.8) / Math.sqrt(3));
+          piece = Matter.Bodies.polygon(
+            x,
+            -side / 2,
+            3,
+            side / (2 * Math.sin(Math.PI / 3)),
+            {
+              ...pieceMaterial,
+              render: { ...pieceMaterial.render, fillStyle: color },
+            }
+          );
+        } else if (shape === "pentagon") {
+          const side = Math.sqrt((4 * targetArea * Math.tan(Math.PI / 5)) / 5);
+          piece = Matter.Bodies.polygon(
+            x,
+            -side / 2,
+            5,
+            side / (2 * Math.sin(Math.PI / 5)),
+            {
+              ...pieceMaterial,
+              render: { ...pieceMaterial.render, fillStyle: color },
+            }
+          );
+        } else if (shape === "hexagon") {
+          const side = Math.sqrt((2 * targetArea) / (3 * Math.sqrt(3)));
+          piece = Matter.Bodies.polygon(x, -side / 2, 6, side, {
+            ...pieceMaterial,
+            render: { ...pieceMaterial.render, fillStyle: color },
+          });
+        } else if (shape === "trapezoid") {
+          const width = Math.sqrt(targetArea * 1.5);
+          const height = (targetArea / width) * 1.2;
+          const vertices = Matter.Vertices.fromPath(
+            "-50 -25, 50 -25, 30 25, -30 25"
+          );
+          Vertices.scale(vertices, width / 100, height / 50);
+          piece = Matter.Bodies.fromVertices(x, -height / 2, [vertices], {
+            ...pieceMaterial,
+            render: { ...pieceMaterial.render, fillStyle: color },
+          });
+        } else if (shape === "rhombus") {
+          const width = Math.sqrt(targetArea * 3.5);
+          const height = (targetArea / width) * 2;
+          const vertices = Matter.Vertices.fromPath("0 -50, 50 0, 0 50, -50 0");
+          Vertices.scale(vertices, width / 100, height / 100);
+          piece = Matter.Bodies.fromVertices(x, -height / 2, [vertices], {
+            ...pieceMaterial,
+            render: { ...pieceMaterial.render, fillStyle: color },
+          });
+        } else if (shape === "oval") {
+          const width = Math.sqrt(targetArea * 3);
+          const height = (targetArea / width) * 1.2;
+          const vertices = [];
+          for (let i = 0; i < 20; i++) {
+            const angle = (i / 20) * Math.PI * 2;
+            vertices.push({
+              x: (width / 2) * Math.cos(angle),
+              y: (height / 2) * Math.sin(angle),
+            });
+          }
+          piece = Matter.Bodies.fromVertices(x, -height / 2, [vertices], {
+            ...pieceMaterial,
+            render: { ...pieceMaterial.render, fillStyle: color },
+          });
+        }
+
+        Matter.Body.setAngularVelocity(piece, (Math.random() - 0.5) * 0.05);
+        Matter.Body.setVelocity(piece, {
+          x: (Math.random() - 0.5) * 2,
+          y: 0.5 + Math.random() * 0.5,
+        });
+
+        Matter.World.add(engine.world, piece);
+        return piece;
+      }
+
+      function gameLoop() {
+        Matter.Engine.update(engine, 1000 / 60);
+        updatePieces();
+        requestAnimationFrame(gameLoop);
+      }
+
+      function updatePieces() {
+        pieces = pieces.filter((piece) => {
+          if (piece.position.y > window.innerHeight + 100) {
+            Matter.Composite.remove(engine.world, piece);
+            return false;
+          }
+          return true;
+        });
+
+        if (
+          pieces.some((p) => p.position.y >= config.triggerYPosition) &&
+          canSpawn
+        ) {
+          canSpawn = false;
+          setTimeout(() => {
+            for (let i = 0; i < 2; i++) {
+              const piece = createPiece();
+              if (piece) pieces.push(piece);
+            }
+            canSpawn = true;
+          }, 300);
+        }
+      }
+
+      function spawnNewPieces() {
+        pieces = pieces.filter((piece) => {
+          if (piece.position.y > window.innerHeight + 100) {
+            if (Matter.Composite.get(engine.world, piece.id)) {
+              Matter.Composite.remove(engine.world, piece);
+            }
+            return false;
+          }
+          return true;
+        });
+        if (pieces.length < 5) {
+          const countToCreate = 5 - pieces.length;
+          const startX = window.innerWidth * 0.1;
+          const stepX = window.innerWidth * 0.2;
+
+          for (let i = 0; i < countToCreate; i++) {
+            setTimeout(() => {
+              const piece = createPiece(startX + stepX * (i % 5));
+              if (piece) {
+                pieces.push(piece);
+              }
+            }, i * 200);
+          }
+        }
+      }
+
+      window.addEventListener("load", () => {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            const piece = createPiece();
+            if (piece) pieces.push(piece);
+          }, i * 200);
+        }
+        gameLoop();
+
+        const bgMusic = document.getElementById("bg-music");
+        const musicSetting = localStorage.getItem("musicSetting") || "on";
+
+        if (musicSetting === "on") {
+          bgMusic.volume = 0.3;
+          bgMusic.play().catch((e) => {
+            console.log("Autoplay prevented:", e);
+          });
+        }
+      });
+
+      document.getElementById("play-btn").addEventListener("click", () => {
+        window.location.href = "game.html";
+      });
+
+      document.getElementById("stats-btn").addEventListener("click", () => {
+        window.location.href = "statistics.html";
+      });
+
+      document.getElementById("settings-btn").addEventListener("click", () => {
+        window.location.href = "settings.html";
+      });
+
+      window.addEventListener("resize", () => {
+        render.options.width = window.innerWidth;
+        render.options.height = window.innerHeight;
+        Matter.Body.setPosition(leftWall, {
+          x: -50,
+          y: window.innerHeight / 2,
+        });
+        Matter.Body.setPosition(rightWall, {
+          x: window.innerWidth + 50,
+          y: window.innerHeight / 2,
+        });
+      });
+    </script>
+  </body>
+</html>
