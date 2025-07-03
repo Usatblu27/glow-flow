@@ -542,7 +542,7 @@
         updatePieces();
         requestAnimationFrame(gameLoop);
       }
-
+      
       function updatePieces() {
         pieces = pieces.filter((piece) => {
           if (piece.position.y > window.innerHeight + 100) {
@@ -551,7 +551,6 @@
           }
           return true;
         });
-
         if (
           pieces.some((p) => p.position.y >= config.triggerYPosition) &&
           canSpawn
