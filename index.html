@@ -324,18 +324,6 @@
           '<h1 style="color:red">Error: Physics engine failed to load</h1>';
         throw new Error("Matter.js not loaded");
       }
-
-      const {
-        Engine,
-        Render,
-        World,
-        Bodies,
-        Body,
-        Vertices,
-        Composite,
-        Runner,
-      } = Matter;
-
       const physicsContainer = document.getElementById("physics-container");
       if (!physicsContainer) {
         document.getElementById("menu-container").innerHTML =
@@ -345,25 +333,25 @@
 
       const engine = Matter.Engine.create({
         enableSleeping: true,
-        gravity: { x: 0, y: 0.05 },
-        positionIterations: 0.05,
-        velocityIterations: 0.05,
-        constraintIterations: 0.05,
+        gravity: { x: 0, y: 0.1 },
       });
 
       const pieceMaterial = {
         friction: 0.001,
-        restitution: 0.05,
+        restitution: 0.2,
         density: 0.001,
-        render: { strokeStyle: "#FFFFFF", lineWidth: 3 },
+        render: {
+          strokeStyle: "#FFFFFF",
+          lineWidth: 3,
+        },
       };
 
       const config = {
-        targetFPS: 30,
+        targetFPS: 60,
         gravity: 0.1,
         baseArea: 1500,
         triggerYPosition: window.innerHeight * 0.3,
-        spawnDelay: 1000,
+        spawnDelay: 300,
       };
 
       let pieces = [];
@@ -400,11 +388,7 @@
       );
       Matter.World.add(engine.world, [leftWall, rightWall]);
 
-      Matter.Render.run(render);
-      const runner = Matter.Runner.create({
-        deltaSampleSize: 5,
-        isFixed: false,
-      });
+      const runner = Matter.Runner.create();
       Matter.Runner.run(runner, engine);
 
       const colors = [
@@ -425,7 +409,6 @@
         "#965C00",
         "#770099",
       ];
-
       const shapes = [
         "circle",
         "square",
@@ -437,7 +420,6 @@
         "rhombus",
         "oval",
       ];
-
       function createPiece() {
         const x = Math.random() * window.innerWidth;
         const shape = shapes[Math.floor(Math.random() * shapes.length)];
@@ -544,11 +526,8 @@
         return piece;
       }
 
-      let lastTime = 0;
-      const updateRate = 1000 / 30;
-
       function gameLoop() {
-        Matter.Engine.update(engine, 1000 / 30);
+        Matter.Engine.update(engine, 1000 / 60);
         updatePieces();
         requestAnimationFrame(gameLoop);
       }
@@ -561,6 +540,7 @@
           }
           return true;
         });
+
         if (
           pieces.some((p) => p.position.y >= config.triggerYPosition) &&
           canSpawn
@@ -572,7 +552,7 @@
               if (piece) pieces.push(piece);
             }
             canSpawn = true;
-          }, 1000);
+          }, 300);
         }
       }
 
@@ -586,40 +566,30 @@
           }
           return true;
         });
-        if (pieces.length < 3) {
-          const countToCreate = 3 - pieces.length;
+        if (pieces.length < 5) {
+          const countToCreate = 5 - pieces.length;
           const startX = window.innerWidth * 0.1;
           const stepX = window.innerWidth * 0.2;
 
           for (let i = 0; i < countToCreate; i++) {
             setTimeout(() => {
-              const piece = createPiece(startX + stepX * (i % 3));
+              const piece = createPiece(startX + stepX * (i % 5));
               if (piece) {
                 pieces.push(piece);
               }
-            }, i * 1000);
+            }, i * 200);
           }
         }
       }
 
       window.addEventListener("load", () => {
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 5; i++) {
           setTimeout(() => {
             const piece = createPiece();
             if (piece) pieces.push(piece);
-          }, i * 1000);
+          }, i * 200);
         }
         gameLoop();
-
-        const bgMusic = document.getElementById("bg-music");
-        const musicSetting = localStorage.getItem("musicSetting") || "on";
-
-        if (musicSetting === "on") {
-          bgMusic.volume = 0.2;
-          bgMusic.play().catch((e) => {
-            console.log("Autoplay prevented:", e);
-          });
-        }
       });
 
       document.getElementById("play-btn").addEventListener("click", () => {
