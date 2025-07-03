@@ -363,6 +363,9 @@
         baseArea: 1500,
         triggerYPosition: window.innerHeight * 0.3,
         spawnDelay: 300,
+        maxPieces: 15,
+        minPieces: 5,
+        spawnBatch: 2,
       };
 
       let pieces = [];
@@ -567,18 +570,19 @@
           return true;
         });
 
-        if (
-          pieces.some((p) => p.position.y >= config.triggerYPosition) &&
-          canSpawn
-        ) {
+        if (pieces.length < config.minPieces && canSpawn) {
           canSpawn = false;
           setTimeout(() => {
-            for (let i = 0; i < 2; i++) {
+            const needed = Math.min(
+              config.spawnBatch,
+              config.maxPieces - pieces.length
+            );
+            for (let i = 0; i < needed; i++) {
               const piece = createPiece();
               if (piece) pieces.push(piece);
             }
             canSpawn = true;
-          }, 300);
+          }, config.spawnDelay);
         }
       }
 
