@@ -358,8 +358,8 @@
       };
 
       const config = {
-        targetFPS: 30,
-        gravity: 0.05,
+        targetFPS: 60,
+        gravity: 0.1,
         baseArea: 1500,
         triggerYPosition: window.innerHeight * 0.3,
         spawnDelay: 300,
@@ -377,8 +377,23 @@
           wireframes: false,
           background: "#302b63",
           showSleeping: false,
+          showDebug: false,
+          showBounds: false,
+          showVelocity: false,
+          showCollisions: false,
+          showAxes: false,
+          showPositions: false,
+          showAngleIndicator: false,
+          showIds: false,
+          showShadows: false,
         },
       });
+
+      const MAX_PIECES = 30;
+
+      engine.positionIterations = 1;
+      engine.velocityIterations = 1;
+      engine.constraintIterations = 1;
 
       Matter.Render.run(render);
 
@@ -538,7 +553,7 @@
       }
 
       function gameLoop() {
-        Matter.Engine.update(engine, 1000 / 30);
+        Matter.Engine.update(engine, 1000 / 60);
         updatePieces();
         requestAnimationFrame(gameLoop);
       }
@@ -626,6 +641,31 @@
           x: window.innerWidth + 50,
           y: window.innerHeight / 2,
         });
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          Matter.Render.stop(render);
+        } else {
+          Matter.Render.run(render);
+        }
+      });
+
+      let resizeTimeout;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          render.options.width = window.innerWidth;
+          render.options.height = window.innerHeight;
+          Matter.Body.setPosition(leftWall, {
+            x: -50,
+            y: window.innerHeight / 2,
+          });
+          Matter.Body.setPosition(rightWall, {
+            x: window.innerWidth + 50,
+            y: window.innerHeight / 2,
+          });
+        }, 100);
       });
     </script>
   </body>
