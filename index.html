@@ -310,11 +310,11 @@
           title.appendChild(span);
         });
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 3; i++) {
           setTimeout(() => {
             const piece = createPiece();
             if (piece) pieces.push(piece);
-          }, i * 200);
+          }, i * 1000);
         }
         gameLoop();
       });
@@ -346,20 +346,20 @@
       const engine = Matter.Engine.create({
         enableSleeping: true,
         gravity: { x: 0, y: 0.05 },
-        positionIterations: 0.1,
-        velocityIterations: 0.1,
-        constraintIterations: 0.1,
+        positionIterations: 0.05,
+        velocityIterations: 0.05,
+        constraintIterations: 0.05,
       });
 
       const pieceMaterial = {
         friction: 0.001,
-        restitution: 0.2,
+        restitution: 0.05,
         density: 0.001,
         render: { strokeStyle: "#FFFFFF", lineWidth: 3 },
       };
 
       const config = {
-        targetFPS: 60,
+        targetFPS: 30,
         gravity: 0.1,
         baseArea: 1500,
         triggerYPosition: window.innerHeight * 0.3,
@@ -607,7 +607,7 @@
           setTimeout(() => {
             const piece = createPiece();
             if (piece) pieces.push(piece);
-          }, i * 200);
+          }, i * 1000);
         }
         gameLoop();
 
