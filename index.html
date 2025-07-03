@@ -331,6 +331,17 @@
         throw new Error("Physics container not found");
       }
 
+      const {
+        Engine,
+        Render,
+        World,
+        Bodies,
+        Body,
+        Vertices,
+        Composite,
+        Runner,
+      } = Matter;
+
       const engine = Matter.Engine.create({
         enableSleeping: true,
         gravity: { x: 0, y: 0.1 },
