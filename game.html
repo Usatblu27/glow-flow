@@ -13,6 +13,11 @@
       content="game, arcade, physics, particles, glow flow, browser game, indie," />
     <meta name="author" content="Usatenko Daniil" />
     <meta property="og:title" content="Glow Flow - Arcade game" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent" />
     <meta
       property="og:description"
       content="A fun game of destroying figures" />
@@ -40,9 +45,16 @@
       }
 
       :root {
+        --light-color: white;
         --magenta-color: #ff00ff;
         --cyan-color: #00ffff;
         --orange-color: #ffa500;
+        --bg-gradient: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+        --btn-hover-opacity: 0.4;
+        --btn-base-opacity: 0.2;
+        --title-glow: 0 0 10px var(--cyan-color), 0 0 20px var(--cyan-color);
+        --title-glow-intense: 0 0 15px var(--cyan-color),
+          0 0 30px var(--cyan-color), 0 0 40px var(--cyan-color);
       }
 
       #game-wrapper {
@@ -50,8 +62,9 @@
         max-width: 500px;
         width: 100%;
         height: 80vh;
-        border: 4px solid white;
-        box-shadow: 0 0 20px white, inset 0 0 20px white;
+        border: 4px solid var(--light-color);
+        box-shadow: 0 0 20px var(--light-color),
+          inset 0 0 20px var(--light-color);
         border-radius: 10px;
         overflow: hidden;
       }
@@ -1232,6 +1245,17 @@
           localStorage.setItem("totalGames", totalGames.toString());
         }
       });
+
+      gameContainer.addEventListener(
+        "touchmove",
+        (e) => {
+          if (!gameActive || !currentPiece) return;
+          if (Math.abs(e.touches[0].clientX - touchStartX) > 10) {
+            e.preventDefault();
+          }
+        },
+        { passive: false }
+      );
 
       initColors();
       bestScore = parseInt(localStorage.getItem("bestScore")) || 0;
