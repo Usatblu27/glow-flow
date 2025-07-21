@@ -352,15 +352,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
     <script>
-      const isLowEndDevice =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
-
-      if (isLowEndDevice) {
-        render.options.wireframes = true;
-        engine.gravity.y = 0.3;
-      }
       window.addEventListener("load", () => {
         const title = document.getElementById("title");
         const text = "GLOW FLOW";
