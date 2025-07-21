@@ -19,6 +19,9 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent" />
     <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent" />
+    <meta
       property="og:description"
       content="A fun game of destroying figures" />
     <meta property="og:type" content="website" />
@@ -41,10 +44,16 @@
         --magenta-color: #ff00ff;
         --cyan-color: #00ffff;
         --orange-color: #ffa500;
+        --bg-gradient: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+        --btn-hover-opacity: 0.4;
+        --btn-base-opacity: 0.2;
+        --title-glow: 0 0 10px var(--cyan-color), 0 0 20px var(--cyan-color);
+        --title-glow-intense: 0 0 15px var(--cyan-color),
+          0 0 30px var(--cyan-color), 0 0 40px var(--cyan-color);
       }
 
       body {
-        background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+        background: var(--bg-gradient);
         font-family: "Arial", sans-serif;
         color: white;
         height: 100vh;
@@ -254,6 +263,20 @@
     </div>
 
     <script>
+      function vibrateButton(duration = 15) {
+        if (
+          localStorage.getItem("vibrationEnabled") !== "false" &&
+          "vibrate" in navigator
+        ) {
+          navigator.vibrate(duration);
+        }
+      }
+
+      document.querySelectorAll(".btn").forEach((button) => {
+        button.addEventListener("click", () => vibrateButton());
+        button.addEventListener("touchstart", () => vibrateButton(10));
+      });
+
       document.addEventListener("DOMContentLoaded", function () {
         const musicVolume = localStorage.getItem("musicVolume") || 50;
         const soundEnabled = localStorage.getItem("soundEnabled") !== "false";
@@ -314,4 +337,3 @@
     </script>
   </body>
 </html>
-
