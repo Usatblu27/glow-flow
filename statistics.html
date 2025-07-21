@@ -19,6 +19,9 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent" />
     <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent" />
+    <meta
       property="og:description"
       content="A fun game of destroying figures" />
     <meta property="og:type" content="website" />
@@ -30,6 +33,17 @@
     <meta name="theme-color" content="#0f0c29" />
     <title>Glow Flow - Statistics</title>
     <style>
+      :root {
+        --magenta-color: #ff00ff;
+        --cyan-color: #00ffff;
+        --bg-gradient: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+        --btn-hover-opacity: 0.4;
+        --btn-base-opacity: 0.2;
+        --title-glow: 0 0 10px var(--cyan-color), 0 0 20px var(--cyan-color);
+        --title-glow-intense: 0 0 15px var(--cyan-color),
+          0 0 30px var(--cyan-color), 0 0 40px var(--cyan-color);
+      }
+
       * {
         user-select: none;
         margin: 0;
@@ -47,12 +61,6 @@
         justify-content: center;
         align-items: center;
         text-align: center;
-      }
-
-      :root {
-        --magenta-color: #ff00ff;
-        --cyan-color: #00ffff;
-        --orange-color: #ffa500;
       }
 
       .container {
@@ -143,6 +151,20 @@
     </div>
 
     <script>
+      function vibrateButton(duration = 15) {
+        if (
+          localStorage.getItem("vibrationEnabled") !== "false" &&
+          "vibrate" in navigator
+        ) {
+          navigator.vibrate(duration);
+        }
+      }
+
+      document.querySelectorAll(".btn").forEach((button) => {
+        button.addEventListener("click", () => vibrateButton());
+        button.addEventListener("touchstart", () => vibrateButton(10)); // Для сенсорных экранов
+      });
+
       function formatTime(seconds) {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
