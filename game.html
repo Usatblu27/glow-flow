@@ -19,6 +19,9 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent" />
     <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent" />
+    <meta
       property="og:description"
       content="A fun game of destroying figures" />
     <meta property="og:type" content="website" />
@@ -30,31 +33,30 @@
     <meta name="theme-color" content="#0f0c29" />
     <title>Glow Flow</title>
     <style>
-      body {
-        user-select: none;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        font-family: "Arial", sans-serif;
-        background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
-        display: flex;
-        justify-content: center;
-        align-items: top;
-        height: 100vh;
-        touch-action: none;
-      }
-
       :root {
         --light-color: white;
         --magenta-color: #ff00ff;
         --cyan-color: #00ffff;
-        --orange-color: #ffa500;
         --bg-gradient: linear-gradient(to right, #0f0c29, #302b63, #24243e);
         --btn-hover-opacity: 0.4;
         --btn-base-opacity: 0.2;
         --title-glow: 0 0 10px var(--cyan-color), 0 0 20px var(--cyan-color);
         --title-glow-intense: 0 0 15px var(--cyan-color),
           0 0 30px var(--cyan-color), 0 0 40px var(--cyan-color);
+      }
+
+      body {
+        user-select: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: "Arial", sans-serif;
+        background: var(--bg-gradient);
+        display: flex;
+        justify-content: center;
+        align-items: top;
+        height: 100vh;
+        touch-action: none;
       }
 
       #game-wrapper {
@@ -84,7 +86,7 @@
         color: var(--magenta-color);
         font-size: 48px;
         font-weight: bold;
-        text-shadow: 0 0 10px white, 0 0 20px white;
+        text-shadow: 0 0 10px var(--light-color), 0 0 20px var(--light-color);
         display: none;
         z-index: 10;
       }
@@ -99,7 +101,7 @@
         padding: 10px 20px;
         border: 2px solid var(--cyan-color);
         border-radius: 5px;
-        text-shadow: 0 0 5px white;
+        text-shadow: 0 0 5px var(--light-color);
         box-shadow: 0 0 10px var(--cyan-color);
         cursor: pointer;
         display: none;
@@ -117,8 +119,9 @@
         left: 0;
         width: 100%;
         height: 2px;
-        background: white;
-        box-shadow: 0 0 20px white, inset 0 0 20px white;
+        background: var(--light-color);
+        box-shadow: 0 0 20px var(--light-color),
+          inset 0 0 20px var(--light-color);
         z-index: 5;
       }
 
@@ -170,7 +173,7 @@
       }
 
       .title {
-        color: #00ffff;
+        color: var(--cyan-color);
         text-align: center;
         margin-top: 0;
       }
@@ -336,6 +339,9 @@
       const collisionSound = document.getElementById("collision-sound");
       const explosionSound = document.getElementById("explosion-sound");
 
+      const vibrationEnabled =
+        localStorage.getItem("vibrationEnabled") !== "false";
+
       bgMusic.volume = 0.2;
       collisionSound.volume = 0.5;
       explosionSound.volume = 0.5;
@@ -446,6 +452,20 @@
           }
         }
       }
+
+      function vibrateButton(duration = 15) {
+        if (
+          localStorage.getItem("vibrationEnabled") !== "false" &&
+          "vibrate" in navigator
+        ) {
+          navigator.vibrate(duration);
+        }
+      }
+
+      document.querySelectorAll(".btn").forEach((button) => {
+        button.addEventListener("click", () => vibrateButton());
+        button.addEventListener("touchstart", () => vibrateButton(10)); // Для сенсорных экранов
+      });
 
       function updateBestScore() {
         if (score > bestScore) {
@@ -1256,6 +1276,24 @@
         },
         { passive: false }
       );
+
+      Events.on(engine, "collisionStart", (event) => {
+        const pairs = event.pairs;
+        for (let pair of pairs) {
+          if (pair.bodyA === currentPiece || pair.bodyB === currentPiece) {
+            if (vibrationEnabled) {
+              navigator.vibrate(30);
+            }
+            break;
+          }
+        }
+      });
+
+      function destroyPieces(pieces) {
+        if (vibrationEnabled) {
+          navigator.vibrate([100, 50, 100]);
+        }
+      }
 
       initColors();
       bestScore = parseInt(localStorage.getItem("bestScore")) || 0;
