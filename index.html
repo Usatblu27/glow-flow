@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="../js/metrika.js"></script>
+    <noscript>
+      <div>
+        <img
+          src="https://mc.yandex.ru/watch/103393211"
+          style="position: absolute; left: -9999px"
+          alt="" />
+      </div>
+    </noscript>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Glow Flow - Exciting arcade physics game with colorful geometric figures" />
+    <meta
+      name="keywords"
+      content="glow flow, arcade game, physics game, browser game" />
+    <meta name="author" content="Usatenko Daniil" />
+    <meta property="og:title" content="Glow Flow - Physics Arcade Game" />
+    <meta property="og:type" content="game" />
+    <meta property="og:site_name" content="Glow Flow" />
+    <meta
+      property="og:description"
+      content="A mesmerizing physics-based arcade game with colorful geometric figures" />
+    <meta
+      property="og:url"
+      content="https://usatblu27.github.io/glow-flow/favicon" />
+    <meta
+      property="og:image"
+      content="https://usatblu27.github.io/glow-flow/icons/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent" />
+    <meta name="theme-color" content="#0f0c29" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://mc.yandex.ru;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: https://mc.yandex.ru;
+  connect-src 'self' https://mc.yandex.ru;
+  frame-src https://mc.yandex.ru;
+  font-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+" />
+    <title>Glow Flow - main</title>
+    <link rel="icon" href="/icons/favicon.png" type="image/x-icon" />
+    <link rel="manifest" href="/json/manifest.json" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+  <body>
+    <div id="physics-container"></div>
+    <div id="menu-container">
+      <h1 id="title"></h1>
+      <div class="btn-container">
+        <button class="btn btn-play" id="play-btn">PLAY</button>
+        <button class="btn btn-statistics" id="stats-btn">STATISTICS</button>
+        <button class="btn btn-settings" id="settings-btn">SETTINGS</button>
+      </div>
+    </div>
+    <div class="copyright">
+      © 2025 Daniil Usatenko / Glow Flow. All rights reserved.
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+    <script src="/js/main.js"></script>
+  </body>
+</html>

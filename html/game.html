@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Glow Flow - Exciting arcade physics game with colorful geometric figures" />
+    <meta
+      name="keywords"
+      content="glow flow, arcade game, physics game, browser game" />
+    <meta name="author" content="Usatenko Daniil" />
+    <meta property="og:title" content="Glow Flow - Physics Arcade Game" />
+    <meta property="og:type" content="game" />
+    <meta property="og:site_name" content="Glow Flow" />
+    <meta
+      property="og:description"
+      content="A mesmerizing physics-based arcade game with colorful geometric figures" />
+    <meta
+      property="og:url"
+      content="https://usatblu27.github.io/glow-flow/favicon" />
+    <meta
+      property="og:image"
+      content="https://usatblu27.github.io/glow-flow/icons/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent" />
+    <meta name="theme-color" content="#0f0c29" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://mc.yandex.ru;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: https://mc.yandex.ru;
+  connect-src 'self' https://mc.yandex.ru;
+  frame-src https://mc.yandex.ru;
+  font-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+" />
+    <title>Glow Flow - game</title>
+    <link rel="icon" href="/icons/favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/game.css" />
+  </head>
+  <body>
+    <div id="game-wrapper">
+      <div id="game-container"></div>
+      <div id="scores-container">
+        <div id="score">SCORE: 0</div>
+        <div id="best-score">BEST: 0</div>
+      </div>
+      <div id="game-over">GAME OVER</div>
+      <div id="restart-btn">RESTART</div>
+      <a href="../index.html" class="neon-back-button">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <path
+            d="M20 0 L0 20 L20 40 M0 20 H40"
+            fill="none"
+            stroke="#ff00ff"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </a>
+      <div id="pause-btn" class="neon-pause-button">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <rect x="10" y="5" width="8" height="30" rx="2" fill="#00ffff" />
+          <rect x="22" y="5" width="8" height="30" rx="2" fill="#00ffff" />
+        </svg>
+      </div>
+    </div>
+
+    <audio id="bg-music" loop>
+      <source src="../audio/bg-music.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="collision-sound">
+      <source src="../audio/collision.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="explosion-sound">
+      <source src="../audio/explosion.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+    <script src="/js/game.js"></script>
+  </body>
+</html>

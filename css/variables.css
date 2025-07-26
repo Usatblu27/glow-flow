@@ -1,0 +1,12 @@
+:root {
+  --light-color: white;
+  --magenta-color: #ff00ff;
+  --cyan-color: #00ffff;
+  --orange-color: #ffa500;
+  --bg-gradient: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+  --btn-hover-opacity: 0.4;
+  --btn-base-opacity: 0.2;
+  --title-glow: 0 0 10px var(--cyan-color), 0 0 20px var(--cyan-color);
+  --title-glow-intense: 0 0 15px var(--cyan-color), 0 0 30px var(--cyan-color),
+    0 0 40px var(--cyan-color);
+}

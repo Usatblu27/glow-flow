@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Glow Flow - Exciting arcade physics game with colorful geometric figures" />
+    <meta
+      name="keywords"
+      content="glow flow, arcade game, physics game, browser game" />
+    <meta name="author" content="Usatenko Daniil" />
+    <meta property="og:title" content="Glow Flow - Physics Arcade Game" />
+    <meta property="og:type" content="game" />
+    <meta property="og:site_name" content="Glow Flow" />
+    <meta
+      property="og:description"
+      content="A mesmerizing physics-based arcade game with colorful geometric figures" />
+    <meta
+      property="og:url"
+      content="https://usatblu27.github.io/glow-flow/favicon" />
+    <meta
+      property="og:image"
+      content="https://usatblu27.github.io/glow-flow/icons/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent" />
+    <meta name="theme-color" content="#0f0c29" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://mc.yandex.ru;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: https://mc.yandex.ru;
+  connect-src 'self' https://mc.yandex.ru;
+  frame-src https://mc.yandex.ru;
+  font-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+" />
+    <title>Glow Flow - statistics</title>
+    <link rel="icon" href="/icons/favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/statistics.css" />
+    <style></style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>STATISTICS</h1>
+      <div class="stats-container">
+        <div class="stat-item">
+          <span>Highest Score:</span>
+          <span class="stat-value" id="high-score">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Total Games Played:</span>
+          <span class="stat-value" id="total-games">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Figures Collected:</span>
+          <span class="stat-value" id="total-shapes">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Total Play Time:</span>
+          <span class="stat-value" id="total-time">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Highest Combo:</span>
+          <span class="stat-value" id="highest-combo">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Figures Cleared:</span>
+          <span class="stat-value" id="figures-cleared">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Last Score:</span>
+          <span class="stat-value" id="last-score">0</span>
+        </div>
+      </div>
+      <div class="btn-container">
+        <a href="../index.html" class="back-btn"> BACK TO MENU</a>
+      </div>
+    </div>
+
+    <script src="../js/statistics.js"></script>
+  </body>
+</html>

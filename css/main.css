@@ -1,0 +1,238 @@
+* {
+  user-select: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  font-family: "Arial", sans-serif;
+  touch-action: manipulation;
+  position: fixed;
+  background: var(--bg-gradient);
+}
+
+#menu-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  margin-bottom: 2rem;
+  color: var(--cyan-color);
+  text-shadow: var(--title-glow);
+  animation: glow-pulse 2s infinite alternate;
+  display: flex;
+  justify-content: center;
+  gap: 0.2em;
+}
+
+h1 span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(-50px);
+  animation: letter-appear 0.5s forwards;
+}
+
+.btn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 220px;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(200px) scale(0.8);
+  border: 2px solid;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.btn-play {
+  animation: btn-appear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+    play-pulse 2s infinite ease-in-out;
+  background: rgba(234, 0, 255, var(--btn-base-opacity));
+  color: var(--magenta-color);
+  border-color: var(--magenta-color);
+  text-shadow: 0 0 5px var(--magenta-color);
+  box-shadow: 0 0 15px var(--magenta-color);
+  animation-delay: 0.8s;
+}
+
+.btn-statistics {
+  animation: btn-appear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  background: rgba(0, 255, 255, var(--btn-base-opacity));
+  color: var(--cyan-color);
+  border-color: var(--cyan-color);
+  text-shadow: 0 0 5px var(--cyan-color);
+  box-shadow: 0 0 15px var(--cyan-color);
+  animation-delay: 1s;
+}
+
+.btn-settings {
+  animation: btn-appear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  background: rgba(255, 165, 0, var(--btn-base-opacity));
+  color: var(--orange-color);
+  border-color: var(--orange-color);
+  text-shadow: 0 0 5px var(--orange-color);
+  box-shadow: 0 0 15px var(--orange-color);
+  animation-delay: 1.2s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-play:hover {
+    background: rgba(234, 0, 255, var(--btn-hover-opacity));
+    transform: scale(1.05);
+    box-shadow: 0 0 25px var(--magenta-color), 0 0 35px rgba(234, 0, 255, 0.2);
+  }
+
+  .btn-statistics:hover {
+    background: rgba(0, 255, 255, var(--btn-hover-opacity));
+    transform: scale(1.05);
+    box-shadow: 0 0 25px var(--cyan-color), 0 0 35px rgba(0, 255, 255, 0.5);
+  }
+
+  .btn-settings:hover {
+    background: rgba(255, 165, 0, var(--btn-hover-opacity));
+    transform: scale(1.05);
+    box-shadow: 0 0 25px var(--orange-color), 0 0 35px rgba(255, 165, 0, 0.5);
+  }
+
+  .btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: 0.5s;
+  }
+
+  .btn:hover::before {
+    left: 100%;
+  }
+
+  .btn::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      transparent,
+      transparent,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transform: rotate(30deg);
+    animation: btn-shine 3s infinite;
+  }
+}
+
+#physics-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+  contain: strict;
+}
+
+.copyright {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  z-index: 10;
+  animation: fade-in 2s forwards;
+  pointer-events: none;
+}
+
+@keyframes glow-pulse {
+  from {
+    text-shadow: var(--title-glow);
+  }
+  to {
+    text-shadow: var(--title-glow-intense);
+  }
+}
+
+@keyframes play-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 15px var(--magenta-color);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px var(--magenta-color), 0 0 60px rgba(234, 0, 255, 0.7);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes btn-shine {
+  from {
+    transform: rotate(30deg) translate(-30%, -30%);
+  }
+  to {
+    transform: rotate(30deg) translate(30%, 30%);
+  }
+}
+
+@keyframes btn-appear {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+}
+
+@keyframes letter-appear {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
