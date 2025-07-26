@@ -920,7 +920,6 @@ function restartGame() {
     }
   }, 30000);
 
-  // Запускаем игру
   Runner.run(runner, engine);
 }
 

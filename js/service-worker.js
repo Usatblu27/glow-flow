@@ -11,6 +11,7 @@ const ASSETS_TO_CACHE = [
   "./css/game.css",
   "./css/settings.css",
   "./css/statistics.css",
+  "./css/offline.css",
   "./js/main.js",
   "./js/game.js",
   "./js/settings.js",
