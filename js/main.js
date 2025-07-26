@@ -322,15 +322,15 @@ window.addEventListener("load", () => {
 });
 
 document.getElementById("play-btn").addEventListener("click", () => {
-  window.location.href = "/html/game.html";
+  window.location.href = "html/game.html";
 });
 
 document.getElementById("stats-btn").addEventListener("click", () => {
-  window.location.href = "/html/statistics.html";
+  window.location.href = "html/statistics.html";
 });
 
 document.getElementById("settings-btn").addEventListener("click", () => {
-  window.location.href = "/html/settings.html";
+  window.location.href = "html/settings.html";
 });
 
 window.addEventListener("resize", () => {
