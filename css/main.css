@@ -99,6 +99,16 @@ h1 span {
   animation-delay: 1.2s;
 }
 
+/* .btn-settings {
+  animation: btn-appear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  background: rgba(0, 255, 255, var(--btn-base-opacity));
+  color: var(--cyan-color);
+  border-color: var(--cyan-color);
+  text-shadow: 0 0 5px var(--cyan-color);
+  box-shadow: 0 0 15px var(--cyan-color);
+  animation-delay: 1.2s;
+} */
+
 @media (hover: hover) and (pointer: fine) {
   .btn-play:hover {
     background: rgba(234, 0, 255, var(--btn-hover-opacity));
@@ -117,6 +127,12 @@ h1 span {
     transform: scale(1.05);
     box-shadow: 0 0 25px var(--orange-color), 0 0 35px rgba(255, 165, 0, 0.5);
   }
+
+  /* .btn-settings:hover {
+    background: rgba(0, 255, 255, var(--btn-hover-opacity));
+    transform: scale(1.05);
+    box-shadow: 0 0 25px var(--cyan-color), 0 0 35px rgba(0, 255, 255, 0.5);
+  } */
 
   .btn::before {
     content: "";
@@ -167,6 +183,20 @@ h1 span {
   z-index: 1;
   overflow: hidden;
   contain: strict;
+}
+
+.telegram-icon {
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+  z-index: 20;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.telegram-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .copyright {

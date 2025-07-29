@@ -1,4 +1,5 @@
 "use strict";
+// Uses Matter.js (https://brm.io/matter-js/)
 if (
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
@@ -13,6 +14,27 @@ if (
     document.body.style.touchAction = "none";
   }
 }
+
+if (
+  window.innerWidth > 768 &&
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  )
+) {
+  window.location.href = window.location.href;
+}
+
+let duration = 15;
+
+function vibrateButton(duration = 15) {
+  if (
+    localStorage.getItem("vibrationEnabled") !== "false" &&
+    "vibrate" in navigator
+  ) {
+    navigator.vibrate(duration);
+  }
+}
+
 window.addEventListener("load", () => {
   const title = document.getElementById("title");
   const text = "GLOW FLOW";

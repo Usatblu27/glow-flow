@@ -1,4 +1,5 @@
 "use strict";
+// Uses Matter.js (https://brm.io/matter-js/)
 if (
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
@@ -12,6 +13,15 @@ if (
     document.body.style.overflow = "hidden";
     document.body.style.touchAction = "none";
   }
+}
+
+if (
+  window.innerWidth > 768 &&
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  )
+) {
+  window.location.href = window.location.href;
 }
 const Engine = Matter.Engine,
   Render = Matter.Render,
@@ -136,6 +146,7 @@ let gameStartTime = Date.now();
 let currentCombo = 0;
 let maxCombo = 0;
 let shapesCollected = 0;
+let duration = 15;
 
 let isPaused = false;
 let runner = null;
@@ -149,10 +160,33 @@ function initColors() {
   colors = allColors.slice(0, unlockedColors);
 }
 
-function togglePause() {
-  if (!gameActive) return;
+function vibrateButton(duration = 15) {
+  if (
+    localStorage.getItem("vibrationEnabled") !== "false" &&
+    "vibrate" in navigator
+  ) {
+    navigator.vibrate(duration);
+  }
+}
 
+document.querySelectorAll(".btn").forEach((button) => {
+  button.addEventListener("click", () => vibrateButton());
+  button.addEventListener("touchstart", () => vibrateButton(10), {
+    passive: true,
+  });
+});
+
+function togglePause() {
   isPaused = !isPaused;
+
+  if (!gameActive) return;
+  const pauseIcon = document.querySelector("#pause-icon");
+  if (isPaused) {
+    pauseIcon.innerHTML = '<path d="M15 5 L30 20 L15 35 Z" fill="#00ffff"/>';
+  } else {
+    pauseIcon.innerHTML =
+      '<rect x="10" y="5" width="8" height="30" rx="2" fill="#00ffff"/><rect x="22" y="5" width="8" height="30" rx="2" fill="#00ffff"/>';
+  }
 
   if (isPaused) {
     if (runner) Runner.stop(runner);
@@ -203,15 +237,6 @@ function vibrate(pattern = 50) {
     } else {
       navigator.vibrate([30, 50, 30]);
     }
-  }
-}
-
-function vibrateButton(duration = 15) {
-  if (
-    localStorage.getItem("vibrationEnabled") !== "false" &&
-    "vibrate" in navigator
-  ) {
-    navigator.vibrate(duration);
   }
 }
 
@@ -675,6 +700,37 @@ function saveStatistics() {
   }
 }
 
+function saveStatistics() {
+  if (!gameActive) return;
+
+  const playTimeSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+  localStorage.setItem("lastScore", score.toString());
+
+  localStorage.setItem(
+    "totalShapes",
+    parseInt(localStorage.getItem("totalShapes") || 0) + shapesCollected
+  );
+  shapesCollected = 0;
+
+  localStorage.setItem(
+    "totalPlayTime",
+    parseInt(localStorage.getItem("totalPlayTime") || 0) + playTimeSeconds
+  );
+
+  if (maxCombo > parseInt(localStorage.getItem("highestCombo") || 0)) {
+    localStorage.setItem("highestCombo", maxCombo.toString());
+  }
+
+  if (playTimeSeconds >= 10) {
+    localStorage.setItem(
+      "totalGames",
+      (parseInt(localStorage.getItem("totalGames") || 0) + 1).toString()
+    );
+  }
+
+  gameStartTime = Date.now();
+}
+
 function addScore(points, color, x, y) {
   if (points <= 0) return;
 
@@ -937,39 +993,48 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-gameContainer.addEventListener("touchstart", (e) => {
-  if (!gameActive || !currentPiece) return;
+gameContainer.addEventListener(
+  "touchstart",
+  (e) => {
+    if (!gameActive || !currentPiece) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    e.preventDefault();
+  },
+  { passive: false }
+);
 
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
-  e.preventDefault();
-});
+gameContainer.addEventListener(
+  "touchmove",
+  (e) => {
+    if (!gameActive || !currentPiece) return;
 
-gameContainer.addEventListener("touchmove", (e) => {
-  if (!gameActive || !currentPiece) return;
+    const touchX = e.touches[0].clientX;
+    const touchY = e.touches[0].clientY;
+    const diffX = touchX - touchStartX;
+    const diffY = touchY - touchStartY;
 
-  const touchX = e.touches[0].clientX;
-  const touchY = e.touches[0].clientY;
-  const diffX = touchX - touchStartX;
-  const diffY = touchY - touchStartY;
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      Body.setVelocity(currentPiece, {
+        x: diffX * 0.2,
+        y: currentPiece.velocity.y,
+      });
+    } else {
+      Body.setAngularVelocity(currentPiece, diffY * 0.002);
+    }
 
-  if (Math.abs(diffX) > Math.abs(diffY)) {
-    Body.setVelocity(currentPiece, {
-      x: diffX * 0.2,
-      y: currentPiece.velocity.y,
-    });
-  } else {
-    Body.setAngularVelocity(currentPiece, diffY * 0.002);
-  }
-
-  touchStartX = touchX;
-  touchStartY = touchY;
-  e.preventDefault();
-});
+    touchStartX = touchX;
+    touchStartY = touchY;
+    e.preventDefault();
+  },
+  { passive: false }
+);
 
 Events.on(engine, "collisionStart", (event) => {
   if (!gameActive || isCheckingLines) return;
-
+  if (vibrationEnabled) {
+    vibrate(30);
+  }
   const pairs = event.pairs;
   let collisionProcessed = false;
 
@@ -982,6 +1047,9 @@ Events.on(engine, "collisionStart", (event) => {
         pair.bodyB === ground ||
         (pieces.includes(pair.bodyA) && pieces.includes(pair.bodyB)))
     ) {
+      if (vibrationEnabled) {
+        vibrate(30);
+      }
       playSound(collisionSound);
 
       if (!collisionProcessed) {
@@ -1034,18 +1102,6 @@ gameContainer.addEventListener(
   },
   { passive: false }
 );
-
-Events.on(engine, "collisionStart", (event) => {
-  const pairs = event.pairs;
-  for (let pair of pairs) {
-    if (pair.bodyA === currentPiece || pair.bodyB === currentPiece) {
-      if (vibrationEnabled) {
-        navigator.vibrate(30);
-      }
-      break;
-    }
-  }
-});
 
 function destroyPieces(pieces) {
   if (vibrationEnabled) {

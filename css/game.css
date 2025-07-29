@@ -274,3 +274,24 @@ body {
   font-weight: bold;
   text-shadow: 0 0 10px var(--cyan-color), 0 0 20px var(--cyan-color);
 }
+
+.share-button {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--orange-color);
+  font-size: 24px;
+  padding: 10px 20px;
+  border: 2px solid var(--orange-color);
+  border-radius: 5px;
+  text-shadow: 0 0 5px var(--orange-color);
+  box-shadow: 0 0 10px var(--orange-color);
+  cursor: pointer;
+  display: none;
+  z-index: 10;
+}
+
+.share-button:hover {
+  background: rgba(255, 165, 0, 0.2);
+}
